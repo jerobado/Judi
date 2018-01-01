@@ -1,3 +1,7 @@
 *.xml
 .idea/Judi.iml
 *.pyc
+*.sql
+/sql/
+_todo.txt
+src/resources/constant.py

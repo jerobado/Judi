@@ -7,6 +7,7 @@
  """
 
 import sys
+sys.path.append('..')
 from PyQt5.QtWidgets import QApplication
 
 APP = QApplication(sys.argv)
@@ -19,9 +20,8 @@ def load_stylesheet():
 
 
 if __name__ == '__main__':
-    from src.gui.main_window import GeeWindow
-    #print(type(load_stylesheet()))
-    window = GeeWindow()
+    from src.gui.main_window import JudiWindow
+    window = JudiWindow()
     window.setStyleSheet(load_stylesheet())
     window.show()
     APP.exec()

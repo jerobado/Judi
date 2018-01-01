@@ -5,7 +5,7 @@ QLabel {
     color: black
 }
 
-#GeeWindow {
+#JudiWindow {
     background-color: #FFFFFF;
 }
 

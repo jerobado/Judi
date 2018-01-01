@@ -1,6 +1,5 @@
 # Judi Main Window
 
-from string import Template
 from PyQt5.QtCore import (Qt,
                           QDate)
 from PyQt5.QtWidgets import (QWidget,
@@ -10,42 +9,82 @@ from PyQt5.QtWidgets import (QWidget,
                              QVBoxLayout,
                              QDateEdit,
                              QPushButton)
-
-__version__ = '0.1a'
-__appname__ = 'Judi'
-
-
-unilever = {'grn': '3125786',
-            'trademark': 'DOVE (STYLISED)',
-            'country_code': 'KOS',
-            'agent': 'Kim & Chang'}
-swarovski = {'grn': '5412462',
-             'trademark': 'SWAROVSKI',
-             'country_code': 'JAP',
-             'agent': 'BM Tokyo'}
-records = (swarovski, unilever)
-non_abbott_template = Template('$sent $trademark ($country_code) $description $sender $recipient')
+from src.resources.constant import (__version__,
+                                    __appname__,
+                                    NON_AB_TEMPLATE,
+                                    CONNECTION_STR)
 
 
-# class ProfilingLabel(QLabel):
-#
-#     def mousePressEvent(self, event):
-#
-#         print('click?!')
+def connect_judi():
+    """  Method that will connect Judi to the server and its databases. This will return conn.
 
-# [x] TODO: forked Gee
-# [] TODO: redesign UI
-class GeeWindow(QWidget):
+        return conn.cursor()
+    """
+
+    _methodname = 'connect_judi'
+
+    try:
+        import pyodbc
+        # Attempting to connect to the server
+        print(f'{_methodname}: Connecting to GSM...')
+        conn = pyodbc.connect(CONNECTION_STR)
+        print(f'{_methodname}: Good! You are now connected to GSM.')
+        return conn.cursor()
+
+    except Exception as e:
+        print(f'{_methodname}: Connection to GSM failed. Try again.\n{e}')
+
+
+def search_grn(raw_grn):  # STATUS: inactive
+    """ Method that will connect to the database and return a GIPM record based on the GRN entered.
+
+        raw_grn -> list
+    """
+
+    # Let's connect to the server
+    try:
+        import pyodbc
+
+        # Try connection to GSM's server
+        print('Initiating spin...')
+        conn = pyodbc.connect(CONNECTION_STR)
+
+        # Tuplelized
+        grn = (raw_grn,)
+
+        # Get the cursor
+        cursor = conn.cursor()
+        cursor.execute(trademark_query_sql, grn)
+
+        # Get the retrieved record
+        record = cursor.fetchone()
+
+        return record
+
+    except Exception as e:
+        print(f'Try again. Error: {e}')
+
+
+def load_sql():
+    """ Method that will retrieve an SQL text. """
+
+    sql_file = open('../sql/search_grn.sql', 'r')
+    return sql_file.read()
+
+
+class JudiWindow(QWidget):
 
     def __init__(self, parent=None):
 
         super().__init__(parent)
         self.date_format = 'yyyyMMdd'
         self.profiling_date = QDate.currentDate()
+        self.search_grn_sql = load_sql()
         self._widgets()
         self._layout()
         self._properties()
         self._connections()
+        self._gsmconnect()
 
     def _widgets(self):
 
@@ -58,7 +97,6 @@ class GeeWindow(QWidget):
         self.senderLineEdit = QLineEdit()
         self.recipientLineEdit = QLineEdit()
         self.profilingLabel = QLabel()
-        #self.profilingLabel = ProfilingLabel()
         self.flatPushButton = QPushButton()
 
     def _properties(self):
@@ -122,27 +160,52 @@ class GeeWindow(QWidget):
         self.senderLineEdit.textChanged.connect(self.on_criteriaChanged)
         self.recipientLineEdit.textChanged.connect(self.on_criteriaChanged)
 
+    def _gsmconnect(self):
+        """ Connect to GSM's server and database and will get the cursor. """
+
+        self.cursor_ = connect_judi()
+
     def on_grnLineEdit_textChanged(self):
 
         grn = self.grnLineEdit.text()
-        for entry in records:
-            if grn == entry['grn']:
-                self.trademarkLineEdit.setText(entry['trademark'])
-                self.country_codeLineEdit.setText(entry['country_code'])
-                self.senderLineEdit.setText(entry['agent'])
-                break
-            else:
-                self.profilingLabel.setText(f'No record found for GRN {grn}. Try again.')
+        #record = search_grn(grn)
+        record = self.search_grn_(grn)
+
+        trademark = record[2]
+        country_code = record[4]
+        agent = record[5]
+
+        self.trademarkLineEdit.setText(trademark)
+        self.country_codeLineEdit.setText(country_code)
+        self.senderLineEdit.setText(agent)
+
+    def search_grn_(self, grn):
+        """ Method that will search a record based on the given GRN. """
+
+        try:
+            print(f'Searching for {grn}...')
+            grn = (grn,)    # Tuplelized :)
+
+            # Execute search query
+            self.cursor_.execute(self.search_grn_sql, grn)
+
+            # Get the retrieved record
+            record = self.cursor_.fetchone()
+            print(f'Record found!')
+            return record
+
+        except Exception as e:
+            print(f'Judi has pressed the self-destruct button!\n{e}')
 
     def on_criteriaChanged(self):
 
         self.profiling_date = self.sentDateEdit.date()
-        profiling_text = non_abbott_template.substitute(sent=self.profiling_date.toString(self.date_format),
-                                                        trademark=self.trademarkLineEdit.text(),
-                                                        country_code=self.country_codeLineEdit.text(),
-                                                        description=self.descriptionLineEdit.text(),
-                                                        sender=self.senderLineEdit.text(),
-                                                        recipient=self.recipientLineEdit.text())
+        profiling_text = NON_AB_TEMPLATE.substitute(sent=self.profiling_date.toString(self.date_format),
+                                                    trademark=self.trademarkLineEdit.text(),
+                                                    country_code=self.country_codeLineEdit.text(),
+                                                    description=self.descriptionLineEdit.text(),
+                                                    sender=self.senderLineEdit.text(),
+                                                    recipient=self.recipientLineEdit.text())
         self.profilingLabel.setText(profiling_text)
 
     def resizeEvent(self, event):
