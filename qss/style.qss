@@ -10,6 +10,10 @@ QLabel {
     width: 60px;
 }
 
+#country_codeLineEdit {
+    width: 10px;
+}
+
 #descriptionLineEdit, #recipientLineEdit {
     background-color: #FCF3CF;
 }
