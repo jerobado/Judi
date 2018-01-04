@@ -5,3 +5,5 @@
 /sql/
 _todo.txt
 src/resources/constant.py
+*.db
+/db/
