@@ -8,9 +8,11 @@ from PyQt5.QtWidgets import (QWidget,
                              QHBoxLayout,
                              QVBoxLayout,
                              QDateEdit,
-                             QPushButton)
+                             QPushButton,
+                             QComboBox)
 from src.resources.constant import (__version__,
                                     __appname__,
+                                    AB_TEMPLATE,
                                     NON_AB_TEMPLATE,
                                     CONNECTION_STR,
                                     CONNECTION_STR_SQLITE)
@@ -110,7 +112,8 @@ class JudiWindow(QWidget):
         self.grnLineEdit = QLineEdit()
         self.sentDateEdit = QDateEdit()
         self.trademarkLineEdit = QLineEdit()
-        self.country_codeLineEdit = QLineEdit()
+        self.countrycodeLineEdit = QLineEdit()
+        self.emailtypeComboBox = QComboBox()
         self.descriptionLineEdit = QLineEdit()
         self.senderLineEdit = QLineEdit()
         self.recipientLineEdit = QLineEdit()
@@ -126,8 +129,12 @@ class JudiWindow(QWidget):
         self.sentDateEdit.setDate(self.profiling_date)
         self.sentDateEdit.setCalendarPopup(True)
         self.trademarkLineEdit.setPlaceholderText('Trademark')
-        self.country_codeLineEdit.setPlaceholderText('Country Code')
-        self.country_codeLineEdit.setObjectName('country_codeLineEdit')
+        self.countrycodeLineEdit.setPlaceholderText('Country Code')
+        self.emailtypeComboBox.addItems(['',
+                                         'INT CORR',
+                                         'EXT CORR',
+                                         'OFF CORR'])
+        self.countrycodeLineEdit.setObjectName('countrycodeLineEdit')
         self.descriptionLineEdit.setPlaceholderText('Brief Description')
         self.descriptionLineEdit.setObjectName('descriptionLineEdit')
         self.senderLineEdit.setPlaceholderText('Sender')
@@ -153,7 +160,8 @@ class JudiWindow(QWidget):
         second_layer = QHBoxLayout()
         second_layer.addWidget(self.sentDateEdit)
         second_layer.addWidget(self.trademarkLineEdit)
-        second_layer.addWidget(self.country_codeLineEdit)
+        second_layer.addWidget(self.countrycodeLineEdit)
+        second_layer.addWidget(self.emailtypeComboBox)
         second_layer.addWidget(self.descriptionLineEdit)
         second_layer.addWidget(self.senderLineEdit)
         second_layer.addWidget(self.recipientLineEdit)
@@ -174,7 +182,8 @@ class JudiWindow(QWidget):
         #self.grnLineEdit.textChanged.connect(self.on_criteriaChanged)
         self.sentDateEdit.dateChanged.connect(self.on_criteriaChanged)
         self.trademarkLineEdit.textChanged.connect(self.on_criteriaChanged)
-        self.country_codeLineEdit.textChanged.connect(self.on_criteriaChanged)
+        self.countrycodeLineEdit.textChanged.connect(self.on_criteriaChanged)
+        self.emailtypeComboBox.currentIndexChanged.connect(self.on_criteriaChanged)
         self.descriptionLineEdit.textChanged.connect(self.on_criteriaChanged)
         self.senderLineEdit.textChanged.connect(self.on_criteriaChanged)
         self.recipientLineEdit.textChanged.connect(self.on_criteriaChanged)
@@ -197,13 +206,12 @@ class JudiWindow(QWidget):
             agent = record[5]
 
             self.trademarkLineEdit.setText(trademark)
-            self.country_codeLineEdit.setText(country_code)
+            self.countrycodeLineEdit.setText(country_code)
             self.senderLineEdit.setText(agent)
 
         except Exception as e:
-            # [x] TODO: if no record found, clear the fields
             self.trademarkLineEdit.clear()
-            self.country_codeLineEdit.clear()
+            self.countrycodeLineEdit.clear()
             self.descriptionLineEdit.clear()
             self.senderLineEdit.clear()
             self.recipientLineEdit.clear()
@@ -229,9 +237,25 @@ class JudiWindow(QWidget):
     def on_criteriaChanged(self):
 
         self.profiling_date = self.sentDateEdit.date()
-        profiling_text = NON_AB_TEMPLATE.substitute(sent=self.profiling_date.toString(self.date_format),
+
+        combobox_index = self.emailtypeComboBox.currentIndex()
+        combobox_text = self.emailtypeComboBox.currentText()
+        print(combobox_index, combobox_text)
+
+        if combobox_index == 0:
+            # If Non-Abbott
+            profiling_text = NON_AB_TEMPLATE.substitute(sent=self.profiling_date.toString(self.date_format),
+                                                        trademark=self.trademarkLineEdit.text(),
+                                                        countrycode=self.countrycodeLineEdit.text(),
+                                                        description=self.descriptionLineEdit.text(),
+                                                        sender=self.senderLineEdit.text(),
+                                                        recipient=self.recipientLineEdit.text())
+        else:
+            # If Abbott
+            profiling_text = AB_TEMPLATE.substitute(sent=self.profiling_date.toString(self.date_format),
                                                     trademark=self.trademarkLineEdit.text(),
-                                                    country_code=self.country_codeLineEdit.text(),
+                                                    countrycode=self.countrycodeLineEdit.text(),
+                                                    emailtype=self.emailtypeComboBox.currentText(),
                                                     description=self.descriptionLineEdit.text(),
                                                     sender=self.senderLineEdit.text(),
                                                     recipient=self.recipientLineEdit.text())

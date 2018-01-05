@@ -10,7 +10,7 @@ QLabel {
     width: 60px;
 }
 
-#country_codeLineEdit {
+#countrycodeLineEdit {
     width: 10px;
 }
 
