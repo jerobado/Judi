@@ -6,14 +6,47 @@ QLabel {
     background-color: #FFFFFF;
 }
 
+#grnLineEdit {
+    width: 75px;
+    max-width: 75px;
+}
+
 #sentDateEdit {
-    width: 60px;
+    width: 75px;
+    max-width: 75px;
+}
+
+#trademarkLineEdit {
+    width: 100px;
+    max-width: 100px;
 }
 
 #countrycodeLineEdit {
-    width: 10px;
+    width: 40px;
+    max-width: 40px;
 }
 
-#descriptionLineEdit, #recipientLineEdit {
+#emailtypeComboBox {
+    width: 75px;
+    max-width: 75px;
+}
+
+#descriptionLineEdit {
+    width: 110px;
+    max-width: 110px;
     background-color: #FCF3CF;
 }
+
+#senderLineEdit {
+    width: 100px;
+    max-width: 100px;
+}
+
+#recipientLineEdit {
+    width: 100px;
+    max-width: 100px;
+    background-color: #FCF3CF;
+}
+
+
+
