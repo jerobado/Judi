@@ -2,6 +2,7 @@
 
 from PyQt5.QtCore import (Qt,
                           QDate)
+from PyQt5.QtGui import QClipboard
 from PyQt5.QtWidgets import (QWidget,
                              QLineEdit,
                              QLabel,
@@ -12,6 +13,7 @@ from PyQt5.QtWidgets import (QWidget,
                              QComboBox)
 from src.resources.constant import (__version__,
                                     __appname__,
+                                    AB_EMAIL_TYPE,
                                     AB_TEMPLATE,
                                     NON_AB_TEMPLATE,
                                     CONNECTION_STR,
@@ -53,41 +55,11 @@ def connect_judi2():
         print(f'{_methodname}: Connection to SQLite failed. Try again.\n{e}')
 
 
-def search_grn(raw_grn):  # STATUS: inactive
-    """ Method that will connect to the database and return a GIPM record based on the GRN entered.
-
-        raw_grn -> list
-    """
-
-    # Let's connect to the server
-    try:
-        import pyodbc
-
-        # Try connection to GSM's server
-        print('Initiating spin...')
-        conn = pyodbc.connect(CONNECTION_STR)
-
-        # Tuplelized
-        grn = (raw_grn,)
-
-        # Get the cursor
-        cursor = conn.cursor()
-        cursor.execute(trademark_query_sql, grn)
-
-        # Get the retrieved record
-        record = cursor.fetchone()
-
-        return record
-
-    except Exception as e:
-        print(f'Try again. Error: {e}')
-
-
 def load_sql():
     """ Method that will retrieve an SQL text. """
 
-    sql_file = open('../sql/search_grn.sql', 'r')
-    #sql_file = open('../sql/search_grn_.sql', 'r')
+    #sql_file = open('../sql/search_grn.sql', 'r')  # Using company's database
+    sql_file = open('../sql/search_grn_.sql', 'r')  # Using SQLite
     return sql_file.read()
 
 
@@ -99,7 +71,7 @@ class JudiWindow(QWidget):
         self.date_format = 'yyyyMMdd'
         self.profiling_date = QDate.currentDate()
         self.search_grn_sql = load_sql()
-        print(self.search_grn_sql)
+        #self.clipboard = None
         self._widgets()
         self._layout()
         self._properties()
@@ -118,33 +90,44 @@ class JudiWindow(QWidget):
         self.senderLineEdit = QLineEdit()
         self.recipientLineEdit = QLineEdit()
         self.profilingLabel = QLabel()
-        self.flatPushButton = QPushButton()
+        self.switchPushButton = QPushButton()
 
     def _properties(self):
 
         self.grnLabel.setText('GRN:')
-        self.grnLineEdit.setPlaceholderText('Trademarks, Searches, etc.')
-        self.grnLineEdit.setMaximumWidth(150)
+
+        self.grnLineEdit.setPlaceholderText('TM Module')
+        self.grnLineEdit.setObjectName('grnLineEdit')
+
         self.sentDateEdit.setObjectName('sentDateEdit')
         self.sentDateEdit.setDate(self.profiling_date)
         self.sentDateEdit.setCalendarPopup(True)
+
         self.trademarkLineEdit.setPlaceholderText('Trademark')
-        self.countrycodeLineEdit.setPlaceholderText('Country Code')
-        self.emailtypeComboBox.addItems(['',
-                                         'INT CORR',
-                                         'EXT CORR',
-                                         'OFF CORR'])
+        self.trademarkLineEdit.setObjectName('trademarkLineEdit')
+
+        self.countrycodeLineEdit.setPlaceholderText('CC')
         self.countrycodeLineEdit.setObjectName('countrycodeLineEdit')
+
+        self.emailtypeComboBox.addItems(AB_EMAIL_TYPE)
+        self.emailtypeComboBox.setObjectName('emailtypeComboBox')
+
         self.descriptionLineEdit.setPlaceholderText('Brief Description')
         self.descriptionLineEdit.setObjectName('descriptionLineEdit')
+
         self.senderLineEdit.setPlaceholderText('Sender')
+        self.senderLineEdit.setObjectName('senderLineEdit')
+
         self.recipientLineEdit.setPlaceholderText('Recipient')
         self.recipientLineEdit.setObjectName('recipientLineEdit')
-        self.profilingLabel.setText('Copy profile here')
+
+        self.profilingLabel.setText('Copy profile text here.')
         self.profilingLabel.setTextInteractionFlags(Qt.TextSelectableByMouse | Qt.TextSelectableByKeyboard)
 
-        self.flatPushButton.setText('Test button')
-        self.flatPushButton.setFlat(True)
+        self.switchPushButton.setText('&S')
+        self.switchPushButton.setMinimumWidth(18)
+        self.switchPushButton.setMaximumWidth(18)
+        self.switchPushButton.setFlat(True)
 
         self.setWindowTitle(f'{__appname__} {__version__}')
         self.setObjectName('JudiWindow')
@@ -164,6 +147,7 @@ class JudiWindow(QWidget):
         second_layer.addWidget(self.emailtypeComboBox)
         second_layer.addWidget(self.descriptionLineEdit)
         second_layer.addWidget(self.senderLineEdit)
+        second_layer.addWidget(self.switchPushButton)
         second_layer.addWidget(self.recipientLineEdit)
 
         third_layer = QHBoxLayout()
@@ -179,21 +163,21 @@ class JudiWindow(QWidget):
     def _connections(self):
 
         self.grnLineEdit.textChanged.connect(self.on_grnLineEdit_textChanged)
-        #self.grnLineEdit.textChanged.connect(self.on_criteriaChanged)
         self.sentDateEdit.dateChanged.connect(self.on_criteriaChanged)
         self.trademarkLineEdit.textChanged.connect(self.on_criteriaChanged)
         self.countrycodeLineEdit.textChanged.connect(self.on_criteriaChanged)
         self.emailtypeComboBox.currentIndexChanged.connect(self.on_criteriaChanged)
         self.descriptionLineEdit.textChanged.connect(self.on_criteriaChanged)
         self.senderLineEdit.textChanged.connect(self.on_criteriaChanged)
+        self.switchPushButton.clicked.connect(self.on_switchPushButton_clicked)
         self.recipientLineEdit.textChanged.connect(self.on_criteriaChanged)
 
     def _gsmconnect(self):
         """ Connect to GSM's server and database and will get the cursor. """
 
         # don't forget to also comment load_sql()
-        self.cursor_ = connect_judi()  # connecting to GSM
-        #self.cursor_ = connect_judi2()   # connecting to sqlite
+        #self.cursor_ = connect_judi()  # connecting to GSM
+        self.cursor_ = connect_judi2()   # connecting to sqlite
 
     def on_grnLineEdit_textChanged(self):
 
@@ -221,8 +205,6 @@ class JudiWindow(QWidget):
     def search_grn_(self, grn):
         """ Method that will search a record based on the given GRN. """
 
-        print(f'search_grn_: {self.cursor_}')
-
         print(f'Searching for {grn}...')
         grn = (grn,)    # Tuplelized :)
 
@@ -239,9 +221,6 @@ class JudiWindow(QWidget):
         self.profiling_date = self.sentDateEdit.date()
 
         combobox_index = self.emailtypeComboBox.currentIndex()
-        combobox_text = self.emailtypeComboBox.currentText()
-        print(combobox_index, combobox_text)
-
         if combobox_index == 0:
             # If Non-Abbott
             profiling_text = NON_AB_TEMPLATE.substitute(sent=self.profiling_date.toString(self.date_format),
@@ -260,6 +239,19 @@ class JudiWindow(QWidget):
                                                     sender=self.senderLineEdit.text(),
                                                     recipient=self.recipientLineEdit.text())
         self.profilingLabel.setText(profiling_text)
+
+        self.clipboard.setText(profiling_text)
+
+    def on_switchPushButton_clicked(self):
+        """ Event handler that will 'switch' the entries of the Sender and Recipient LineEdits. """
+
+        # Get the current values of the fields
+        sender = self.senderLineEdit.text()
+        recipient = self.recipientLineEdit.text()
+
+        # Perform the simple switching of values
+        self.senderLineEdit.setText(recipient)
+        self.recipientLineEdit.setText(sender)
 
     def resizeEvent(self, event):
 
