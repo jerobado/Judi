@@ -14,7 +14,6 @@ APP = QApplication(sys.argv)
 
 
 def load_stylesheet():
-
     stylesheet = open('../qss/style.qss', 'r')
     return stylesheet.read()
 
@@ -22,6 +21,7 @@ def load_stylesheet():
 if __name__ == '__main__':
     from src.gui.main_window import JudiWindow
     window = JudiWindow()
+    window.clipboard = APP.clipboard()
     window.setStyleSheet(load_stylesheet())
     window.show()
     APP.exec()
