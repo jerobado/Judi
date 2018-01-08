@@ -1,10 +1,12 @@
 # Judi Main Window
 
 from PyQt5.QtCore import (Qt,
-                          QDate)
-from PyQt5.QtGui import QClipboard
+                          QDate,
+                          QFile)
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (QWidget,
                              QLineEdit,
+                             QTextEdit,
                              QLabel,
                              QHBoxLayout,
                              QVBoxLayout,
@@ -18,6 +20,7 @@ from src.resources.constant import (__version__,
                                     NON_AB_TEMPLATE,
                                     CONNECTION_STR,
                                     CONNECTION_STR_SQLITE)
+from resources import judi_resources
 
 
 def connect_judi():
@@ -71,7 +74,6 @@ class JudiWindow(QWidget):
         self.date_format = 'yyyyMMdd'
         self.profiling_date = QDate.currentDate()
         self.search_grn_sql = load_sql()
-        #self.clipboard = None
         self._widgets()
         self._layout()
         self._properties()
@@ -88,9 +90,10 @@ class JudiWindow(QWidget):
         self.emailtypeComboBox = QComboBox()
         self.descriptionLineEdit = QLineEdit()
         self.senderLineEdit = QLineEdit()
+        self.switchPushButton = QPushButton()
         self.recipientLineEdit = QLineEdit()
         self.profilingLabel = QLabel()
-        self.switchPushButton = QPushButton()
+        self.profilingTextEdit = QTextEdit()
 
     def _properties(self):
 
@@ -118,16 +121,19 @@ class JudiWindow(QWidget):
         self.senderLineEdit.setPlaceholderText('Sender')
         self.senderLineEdit.setObjectName('senderLineEdit')
 
+        self.switchPushButton.setObjectName('switchPushButton')
+        self.switchPushButton.setShortcut('Alt+S')
+        self.switchPushButton.setFlat(True)
+        self.switchPushButton.setIcon(QIcon(':/switch1-16.png'))
+
         self.recipientLineEdit.setPlaceholderText('Recipient')
         self.recipientLineEdit.setObjectName('recipientLineEdit')
 
         self.profilingLabel.setText('Copy profile text here.')
         self.profilingLabel.setTextInteractionFlags(Qt.TextSelectableByMouse | Qt.TextSelectableByKeyboard)
 
-        self.switchPushButton.setText('&S')
-        self.switchPushButton.setMinimumWidth(18)
-        self.switchPushButton.setMaximumWidth(18)
-        self.switchPushButton.setFlat(True)
+        self.profilingTextEdit.setObjectName('profilingTextEdit')
+        self.profilingTextEdit.setPlaceholderText('Copy Document Naming Convention here.')
 
         self.setWindowTitle(f'{__appname__} {__version__}')
         self.setObjectName('JudiWindow')
@@ -153,10 +159,14 @@ class JudiWindow(QWidget):
         third_layer = QHBoxLayout()
         third_layer.addWidget(self.profilingLabel)
 
+        fourth_layer = QHBoxLayout()
+        fourth_layer.addWidget(self.profilingTextEdit)
+
         first_col = QVBoxLayout()
         first_col.addLayout(first_layer)
         first_col.addLayout(second_layer)
-        first_col.addLayout(third_layer)
+        #first_col.addLayout(third_layer)
+        first_col.addLayout(fourth_layer)
 
         self.setLayout(first_col)
 
@@ -199,7 +209,8 @@ class JudiWindow(QWidget):
             self.descriptionLineEdit.clear()
             self.senderLineEdit.clear()
             self.recipientLineEdit.clear()
-            self.profilingLabel.setText('No record found. Try again.')
+            #self.profilingLabel.setText('No record found. Try again.')
+            self.profilingTextEdit.setText('No record found. Try again.')
             print(f'on_grnLineEdit_textChanged: {e}')
 
     def search_grn_(self, grn):
@@ -238,8 +249,8 @@ class JudiWindow(QWidget):
                                                     description=self.descriptionLineEdit.text(),
                                                     sender=self.senderLineEdit.text(),
                                                     recipient=self.recipientLineEdit.text())
-        self.profilingLabel.setText(profiling_text)
 
+        self.profilingTextEdit.setText(profiling_text)
         self.clipboard.setText(profiling_text)
 
     def on_switchPushButton_clicked(self):
