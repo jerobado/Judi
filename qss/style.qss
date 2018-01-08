@@ -42,11 +42,18 @@ QLabel {
     max-width: 100px;
 }
 
+#switchPushButton {
+    width: 18px;
+    max-width: 18px;
+}
+
 #recipientLineEdit {
     width: 100px;
     max-width: 100px;
     background-color: #FCF3CF;
 }
 
-
+#profilingTextEdit {
+    max-height: 40px;
+}
 
