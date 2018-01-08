@@ -1,0 +1,12 @@
+<!DOCTYPE RCC><RCC version="1.0">
+    <qresource>
+        <file alias="switch1-16.png">images/switch1-icon-16.png</file>
+        <file alias="switch2-16.png">images/switch2-icon-16.png</file>
+        <file alias="switch3-16.png">images/switch3-icon-16.png</file>
+        <file alias="switch4-16.png">images/switch4-icon-16.png</file>
+    </qresource>
+</RCC>
+
+<!-- move resources.qrc (this file) in the root folder before running the command below -->
+<!-- pyrcc5 -o resources/judi_resources.py resources.qrc -->
+<!-- then add this line: "from resources import judi_resources" in the main_window.py -->
