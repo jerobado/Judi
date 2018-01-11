@@ -1,8 +1,7 @@
 # Judi Main Window
 
 from PyQt5.QtCore import (Qt,
-                          QDate,
-                          QFile)
+                          QDate)
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (QWidget,
                              QLineEdit,
@@ -92,14 +91,13 @@ class JudiWindow(QWidget):
         self.senderLineEdit = QLineEdit()
         self.switchPushButton = QPushButton()
         self.recipientLineEdit = QLineEdit()
-        self.profilingLabel = QLabel()
-        self.profilingTextEdit = QTextEdit()
+        self.dncTextEdit = QTextEdit()
 
     def _properties(self):
 
         self.grnLabel.setText('GRN:')
 
-        self.grnLineEdit.setPlaceholderText('TM Module')
+        self.grnLineEdit.setPlaceholderText('Trademarks')
         self.grnLineEdit.setObjectName('grnLineEdit')
 
         self.sentDateEdit.setObjectName('sentDateEdit')
@@ -129,15 +127,13 @@ class JudiWindow(QWidget):
         self.recipientLineEdit.setPlaceholderText('Recipient')
         self.recipientLineEdit.setObjectName('recipientLineEdit')
 
-        self.profilingLabel.setText('Copy profile text here.')
-        self.profilingLabel.setTextInteractionFlags(Qt.TextSelectableByMouse | Qt.TextSelectableByKeyboard)
-
-        self.profilingTextEdit.setObjectName('profilingTextEdit')
-        self.profilingTextEdit.setPlaceholderText('Copy Document Naming Convention here.')
+        self.dncTextEdit.setObjectName('dncTextEdit')
+        self.dncTextEdit.setPlaceholderText('Document Naming Convention')
 
         self.setWindowTitle(f'{__appname__} {__version__}')
         self.setObjectName('JudiWindow')
         self.resize(616, 110)   # width, height
+        self.setTabOrder(self.senderLineEdit, self.recipientLineEdit)
 
     def _layout(self):
 
@@ -157,16 +153,12 @@ class JudiWindow(QWidget):
         second_layer.addWidget(self.recipientLineEdit)
 
         third_layer = QHBoxLayout()
-        third_layer.addWidget(self.profilingLabel)
-
-        fourth_layer = QHBoxLayout()
-        fourth_layer.addWidget(self.profilingTextEdit)
+        third_layer.addWidget(self.dncTextEdit)
 
         first_col = QVBoxLayout()
         first_col.addLayout(first_layer)
         first_col.addLayout(second_layer)
-        #first_col.addLayout(third_layer)
-        first_col.addLayout(fourth_layer)
+        first_col.addLayout(third_layer)
 
         self.setLayout(first_col)
 
@@ -192,26 +184,32 @@ class JudiWindow(QWidget):
     def on_grnLineEdit_textChanged(self):
 
         try:
+            # Search for the package
             grn = self.grnLineEdit.text()
             record = self.search_grn_(grn)
 
+            # Parse the package
             trademark = record[2]
             country_code = record[4]
             agent = record[5]
 
+            # Deliver the package
             self.trademarkLineEdit.setText(trademark)
             self.countrycodeLineEdit.setText(country_code)
             self.senderLineEdit.setText(agent)
 
-        except Exception as e:
+        except TypeError as e:  # Found no record
             self.trademarkLineEdit.clear()
             self.countrycodeLineEdit.clear()
             self.descriptionLineEdit.clear()
             self.senderLineEdit.clear()
             self.recipientLineEdit.clear()
-            #self.profilingLabel.setText('No record found. Try again.')
-            self.profilingTextEdit.setText('No record found. Try again.')
-            print(f'on_grnLineEdit_textChanged: {e}')
+            self.dncTextEdit.setText('No record found. Try again.')
+            print(f'on_grnLineEdit_textChanged: {e} {type(e)}')
+
+        except Exception as e:  # Trying to catch that 'timeout' error
+            self.dncTextEdit.setText('Your sessions has timed-out. Try re-opening Judi.')
+            print(f'on_grnLineEdit_textChanged: {e} {type(e)}')
 
     def search_grn_(self, grn):
         """ Method that will search a record based on the given GRN. """
@@ -250,7 +248,7 @@ class JudiWindow(QWidget):
                                                     sender=self.senderLineEdit.text(),
                                                     recipient=self.recipientLineEdit.text())
 
-        self.profilingTextEdit.setText(profiling_text)
+        self.dncTextEdit.setText(profiling_text)
         self.clipboard.setText(profiling_text)
 
     def on_switchPushButton_clicked(self):
