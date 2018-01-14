@@ -5,6 +5,6 @@ All notable changes to this project will be documented on this file.
 **Patch 0.1.x**
 
 * Features
-    * Search records in _TM Module_.
-    * Easy profiling of email using the _Document Naming Convention_ fields.
-    * Auto-copy of _Document Naming Convention_ text.
+    * Search _GIPM_ record by simply entering its _Global Record Number_.
+    * Easily create _Document Naming Convention_ using the pre-populated details.
+    * Auto-copy of generated _Document Naming Convention_.
