@@ -29,6 +29,7 @@ def connect_judi():
     """
 
     _methodname = 'connect_judi'
+    print(f'{_methodname}: {CONNECTION_STR}')
 
     try:
         import pyodbc
@@ -46,6 +47,7 @@ def connect_judi2():
     """ Thiw will connect to the SQLite database. """
 
     _methodname = 'connect_judi2'
+    print(CONNECTION_STR)
 
     try:
         print(f'{_methodname}: Connecting to SQLite...')
@@ -184,26 +186,28 @@ class JudiWindow(QWidget):
     def on_grnLineEdit_textChanged(self):
 
         try:
-            # Search for the package
+            # Get the package to deliver
             grn = self.grnLineEdit.text()
-            record = self.search_grn_(grn)
 
-            # Parse the package
-            trademark = record[2]
-            country_code = record[4]
-            agent = record[5]
+            if grn:  # has content, perform the search
+                record = self.search_grn_(grn)
 
-            # Deliver the package
-            self.trademarkLineEdit.setText(trademark)
-            self.countrycodeLineEdit.setText(country_code)
-            self.senderLineEdit.setText(agent)
+                # Parse the package
+                trademark = record[2]
+                country_code = record[4]
+                agent = record[5]
 
-        except TypeError as e:  # Found no record
-            self.trademarkLineEdit.clear()
-            self.countrycodeLineEdit.clear()
-            self.descriptionLineEdit.clear()
-            self.senderLineEdit.clear()
-            self.recipientLineEdit.clear()
+                # Deliver the package
+                self.trademarkLineEdit.setText(trademark)
+                self.countrycodeLineEdit.setText(country_code)
+                self.senderLineEdit.setText(agent)
+
+            else:   # has no content
+                self.clear_criteria_fields()
+                self.dncTextEdit.clear()
+
+        except TypeError as e:  # No record found
+            self.clear_criteria_fields()
             self.dncTextEdit.setText('No record found. Try again.')
             print(f'on_grnLineEdit_textChanged: {e} {type(e)}')
 
@@ -224,6 +228,15 @@ class JudiWindow(QWidget):
         record = self.cursor_.fetchone()
         print(f'Record found! -> {record}')
         return record
+
+    def clear_criteria_fields(self):
+        """ Method that will clear the content of the input fields. """
+
+        self.trademarkLineEdit.clear()
+        self.countrycodeLineEdit.clear()
+        self.descriptionLineEdit.clear()
+        self.senderLineEdit.clear()
+        self.recipientLineEdit.clear()
 
     def on_criteriaChanged(self):
 
