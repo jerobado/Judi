@@ -1,7 +1,8 @@
 # Judi Main Window
 
 from PyQt5.QtCore import (Qt,
-                          QDate)
+                          QDate,
+                          QSettings)
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (QWidget,
                              QLineEdit,
@@ -18,7 +19,10 @@ from src.resources.constant import (__version__,
                                     AB_TEMPLATE,
                                     NON_AB_TEMPLATE,
                                     CONNECTION_STR,
-                                    CONNECTION_STR_SQLITE)
+                                    CONNECTION_STR_SQLITE,
+                                    SETTINGS_GEOMETRY,
+                                    STYLESHEET,
+                                    SEARCH_GRN_SQL)
 from resources import judi_resources
 
 
@@ -59,14 +63,6 @@ def connect_judi2():
         print(f'{_methodname}: Connection to SQLite failed. Try again.\n{e}')
 
 
-def load_sql():
-    """ Method that will retrieve an SQL text. """
-
-    #sql_file = open('../sql/search_grn.sql', 'r')  # Using company's database
-    sql_file = open('../sql/search_grn_.sql', 'r')  # Using SQLite
-    return sql_file.read()
-
-
 class JudiWindow(QWidget):
 
     def __init__(self, parent=None):
@@ -74,12 +70,14 @@ class JudiWindow(QWidget):
         super().__init__(parent)
         self.date_format = 'yyyyMMdd'
         self.profiling_date = QDate.currentDate()
-        self.search_grn_sql = load_sql()
+        self.search_grn_sql = SEARCH_GRN_SQL
+        self.settings = QSettings()
         self._widgets()
         self._layout()
         self._properties()
         self._connections()
         self._gsmconnect()
+        self._read_settings()
 
     def _widgets(self):
 
@@ -97,7 +95,8 @@ class JudiWindow(QWidget):
 
     def _properties(self):
 
-        self.grnLabel.setText('GRN:')
+        self.grnLabel.setText('&GRN:')
+        self.grnLabel.setBuddy(self.grnLineEdit)
 
         self.grnLineEdit.setPlaceholderText('Trademarks')
         self.grnLineEdit.setObjectName('grnLineEdit')
@@ -135,6 +134,7 @@ class JudiWindow(QWidget):
         self.setWindowTitle(f'{__appname__} {__version__}')
         self.setObjectName('JudiWindow')
         self.resize(616, 110)   # width, height
+        self.setStyleSheet(STYLESHEET)
         self.setTabOrder(self.senderLineEdit, self.recipientLineEdit)
 
     def _layout(self):
@@ -182,6 +182,10 @@ class JudiWindow(QWidget):
         # don't forget to also comment load_sql()
         #self.cursor_ = connect_judi()  # connecting to GSM
         self.cursor_ = connect_judi2()   # connecting to sqlite
+
+    def _read_settings(self):
+
+        self.restoreGeometry(self.settings.value(SETTINGS_GEOMETRY, self.saveGeometry()))
 
     def on_grnLineEdit_textChanged(self):
 
@@ -275,6 +279,15 @@ class JudiWindow(QWidget):
         self.senderLineEdit.setText(recipient)
         self.recipientLineEdit.setText(sender)
 
+    def _write_settings(self):
+
+        self.settings.setValue(SETTINGS_GEOMETRY, self.saveGeometry())
+
     def resizeEvent(self, event):
 
-        print(f'w x h: {self.height()} x {self.width()}')
+        #print(f'w x h: {self.height()} x {self.width()}')
+        pass
+
+    def closeEvent(self, event):
+
+        self._write_settings()

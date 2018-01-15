@@ -1,4 +1,4 @@
-""" Judi, the profiler
+""" Judi the profiler, is a desktop application that can find a GIPM record with 100% full confidence.
 
     Interface: GUI (PyQt5)
     Language: Python 3.6.3
@@ -7,21 +7,17 @@
  """
 
 import sys
-sys.path.append('..')
 from PyQt5.QtWidgets import QApplication
+from src.resources.constant import (__appname__,
+                                    __orgname__)
 
 APP = QApplication(sys.argv)
-
-
-def load_stylesheet():
-    stylesheet = open('../qss/style.qss', 'r')
-    return stylesheet.read()
-
+APP.setOrganizationName(__orgname__)
+APP.setApplicationName(__appname__)
 
 if __name__ == '__main__':
     from src.gui.main_window import JudiWindow
     window = JudiWindow()
     window.clipboard = APP.clipboard()
-    window.setStyleSheet(load_stylesheet())
     window.show()
     APP.exec()
