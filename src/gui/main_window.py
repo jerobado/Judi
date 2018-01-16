@@ -2,7 +2,8 @@
 
 from PyQt5.QtCore import (Qt,
                           QDate,
-                          QSettings)
+                          QSettings,
+                          QEvent)
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (QWidget,
                              QLineEdit,
@@ -33,7 +34,6 @@ def connect_judi():
     """
 
     _methodname = 'connect_judi'
-    print(f'{_methodname}: {CONNECTION_STR}')
 
     try:
         import pyodbc
@@ -51,7 +51,6 @@ def connect_judi2():
     """ Thiw will connect to the SQLite database. """
 
     _methodname = 'connect_judi2'
-    print(CONNECTION_STR)
 
     try:
         print(f'{_methodname}: Connecting to SQLite...')
@@ -63,6 +62,23 @@ def connect_judi2():
         print(f'{_methodname}: Connection to SQLite failed. Try again.\n{e}')
 
 
+# TEST: customizing our combobox
+class JudiComboBox(QComboBox):
+
+    def keyPressEvent(self, event):
+
+        pass
+        #print(event.key(), Qt.Key_A)
+
+        # if self.hasFocus():
+        #     self.setCurrentIndex(self.currentIndex())
+
+        # if event.type() == QEvent.KeyPress and self.hasFocus():
+        #     print('tab?')
+        #     self.setCurrentIndex(self.currentIndex())
+        #print('key?')
+
+
 class JudiWindow(QWidget):
 
     def __init__(self, parent=None):
@@ -70,7 +86,6 @@ class JudiWindow(QWidget):
         super().__init__(parent)
         self.date_format = 'yyyyMMdd'
         self.profiling_date = QDate.currentDate()
-        self.search_grn_sql = SEARCH_GRN_SQL
         self.settings = QSettings()
         self._widgets()
         self._layout()
@@ -87,6 +102,7 @@ class JudiWindow(QWidget):
         self.trademarkLineEdit = QLineEdit()
         self.countrycodeLineEdit = QLineEdit()
         self.emailtypeComboBox = QComboBox()
+        #self.emailtypeComboBox = JudiComboBox()
         self.descriptionLineEdit = QLineEdit()
         self.senderLineEdit = QLineEdit()
         self.switchPushButton = QPushButton()
@@ -226,7 +242,7 @@ class JudiWindow(QWidget):
         grn = (grn,)    # Tuplelized :)
 
         # Execute search query
-        self.cursor_.execute(self.search_grn_sql, grn)
+        self.cursor_.execute(SEARCH_GRN_SQL, grn)
 
         # Get the retrieved record
         record = self.cursor_.fetchone()
@@ -247,15 +263,7 @@ class JudiWindow(QWidget):
         self.profiling_date = self.sentDateEdit.date()
 
         combobox_index = self.emailtypeComboBox.currentIndex()
-        if combobox_index == 0:
-            # If Non-Abbott
-            profiling_text = NON_AB_TEMPLATE.substitute(sent=self.profiling_date.toString(self.date_format),
-                                                        trademark=self.trademarkLineEdit.text(),
-                                                        countrycode=self.countrycodeLineEdit.text(),
-                                                        description=self.descriptionLineEdit.text(),
-                                                        sender=self.senderLineEdit.text(),
-                                                        recipient=self.recipientLineEdit.text())
-        else:
+        if combobox_index:
             # If Abbott
             profiling_text = AB_TEMPLATE.substitute(sent=self.profiling_date.toString(self.date_format),
                                                     trademark=self.trademarkLineEdit.text(),
@@ -264,6 +272,14 @@ class JudiWindow(QWidget):
                                                     description=self.descriptionLineEdit.text(),
                                                     sender=self.senderLineEdit.text(),
                                                     recipient=self.recipientLineEdit.text())
+        else:
+            # If Non-Abbott
+            profiling_text = NON_AB_TEMPLATE.substitute(sent=self.profiling_date.toString(self.date_format),
+                                                        trademark=self.trademarkLineEdit.text(),
+                                                        countrycode=self.countrycodeLineEdit.text(),
+                                                        description=self.descriptionLineEdit.text(),
+                                                        sender=self.senderLineEdit.text(),
+                                                        recipient=self.recipientLineEdit.text())
 
         self.dncTextEdit.setText(profiling_text)
         self.clipboard.setText(profiling_text)
@@ -287,6 +303,10 @@ class JudiWindow(QWidget):
 
         #print(f'w x h: {self.height()} x {self.width()}')
         pass
+
+    # def keyPressEvent(self, event):
+    #
+    #     print(event.key(), event.text())
 
     def closeEvent(self, event):
 
