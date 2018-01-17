@@ -23,7 +23,9 @@ from src.resources.constant import (__version__,
                                     CONNECTION_STR_SQLITE,
                                     SETTINGS_GEOMETRY,
                                     STYLESHEET,
-                                    SEARCH_GRN_SQL)
+                                    SEARCH_GRN_SQL,
+                                    USERNAME,
+                                    DATE_FORMAT)
 from resources import judi_resources
 
 
@@ -65,9 +67,17 @@ def connect_judi2():
 # TEST: customizing our combobox
 class JudiComboBox(QComboBox):
 
-    def keyPressEvent(self, event):
+    def focusInEvent(self, event):
 
-        pass
+        print('combobox focus IN')
+
+    def focusOutEvent(self, event):
+
+        # IDEA: if this widget lost its focus by means of pressing a tab, get the last known selected index :)
+        # FINDINGS: when the dropdown is activated keyPressEvent is not active
+
+        print('combobox focus OUT')
+        #pass
         #print(event.key(), Qt.Key_A)
 
         # if self.hasFocus():
@@ -78,13 +88,16 @@ class JudiComboBox(QComboBox):
         #     self.setCurrentIndex(self.currentIndex())
         #print('key?')
 
+    def keyPressEvent(self, event):
+
+        print(f'{event.key()}')
+
 
 class JudiWindow(QWidget):
 
     def __init__(self, parent=None):
 
         super().__init__(parent)
-        self.date_format = 'yyyyMMdd'
         self.profiling_date = QDate.currentDate()
         self.settings = QSettings()
         self._widgets()
@@ -147,7 +160,7 @@ class JudiWindow(QWidget):
         self.dncTextEdit.setObjectName('dncTextEdit')
         self.dncTextEdit.setPlaceholderText('Document Naming Convention')
 
-        self.setWindowTitle(f'{__appname__} {__version__}')
+        self.setWindowTitle(f'{__appname__} {__version__} - {USERNAME}')
         self.setObjectName('JudiWindow')
         self.resize(616, 110)   # width, height
         self.setStyleSheet(STYLESHEET)
@@ -265,7 +278,7 @@ class JudiWindow(QWidget):
         combobox_index = self.emailtypeComboBox.currentIndex()
         if combobox_index:
             # If Abbott
-            profiling_text = AB_TEMPLATE.substitute(sent=self.profiling_date.toString(self.date_format),
+            profiling_text = AB_TEMPLATE.substitute(sent=self.profiling_date.toString(DATE_FORMAT),
                                                     trademark=self.trademarkLineEdit.text(),
                                                     countrycode=self.countrycodeLineEdit.text(),
                                                     emailtype=self.emailtypeComboBox.currentText(),
@@ -274,7 +287,7 @@ class JudiWindow(QWidget):
                                                     recipient=self.recipientLineEdit.text())
         else:
             # If Non-Abbott
-            profiling_text = NON_AB_TEMPLATE.substitute(sent=self.profiling_date.toString(self.date_format),
+            profiling_text = NON_AB_TEMPLATE.substitute(sent=self.profiling_date.toString(DATE_FORMAT),
                                                         trademark=self.trademarkLineEdit.text(),
                                                         countrycode=self.countrycodeLineEdit.text(),
                                                         description=self.descriptionLineEdit.text(),
@@ -304,10 +317,14 @@ class JudiWindow(QWidget):
         #print(f'w x h: {self.height()} x {self.width()}')
         pass
 
-    # def keyPressEvent(self, event):
-    #
-    #     print(event.key(), event.text())
-
     def closeEvent(self, event):
 
         self._write_settings()
+
+    def focusInEvent(self, event):
+
+        print('Judi in focus?')
+
+    def focusOutEvent(self, event):
+
+        print('Judi out focus?')
