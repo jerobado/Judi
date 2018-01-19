@@ -1,9 +1,8 @@
 # Judi Main Window
 
-from PyQt5.QtCore import (Qt,
-                          QDate,
+from PyQt5.QtCore import (QDate,
                           QSettings,
-                          QEvent)
+                          Qt)
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (QWidget,
                              QLineEdit,
@@ -12,8 +11,8 @@ from PyQt5.QtWidgets import (QWidget,
                              QHBoxLayout,
                              QVBoxLayout,
                              QDateEdit,
-                             QPushButton,
-                             QComboBox)
+                             QPushButton)
+from src.gui.widgets.combobox import JudiComboBox
 from src.resources.constant import (__version__,
                                     __appname__,
                                     AB_EMAIL_TYPE,
@@ -26,7 +25,7 @@ from src.resources.constant import (__version__,
                                     SEARCH_GRN_SQL,
                                     USERNAME,
                                     DATE_FORMAT)
-from resources import judi_resources
+from src.resources import judi_resources
 
 
 def connect_judi():
@@ -36,6 +35,7 @@ def connect_judi():
     """
 
     _methodname = 'connect_judi'
+    print(CONNECTION_STR)
 
     try:
         import pyodbc
@@ -64,24 +64,6 @@ def connect_judi2():
         print(f'{_methodname}: Connection to SQLite failed. Try again.\n{e}')
 
 
-# TEST: customizing our combobox
-class JudiComboBox(QComboBox):
-
-    def __init__(self):
-
-        QComboBox.__init__(self)
-        self.view().installEventFilter(self)
-
-    def eventFilter(self, obj, event):
-
-        if event.type() == QEvent.ShortcutOverride:
-            if event.key() == Qt.Key_Tab:
-                self.hidePopup()
-                self.setCurrentIndex(self.view().currentIndex().row())
-                return True
-        return QComboBox.eventFilter(self, obj, event)
-
-
 class JudiWindow(QWidget):
 
     def __init__(self, parent=None):
@@ -103,7 +85,6 @@ class JudiWindow(QWidget):
         self.sentDateEdit = QDateEdit()
         self.trademarkLineEdit = QLineEdit()
         self.countrycodeLineEdit = QLineEdit()
-        #self.emailtypeComboBox = QComboBox()
         self.emailtypeComboBox = JudiComboBox()
         self.descriptionLineEdit = QLineEdit()
         self.senderLineEdit = QLineEdit()
@@ -198,8 +179,8 @@ class JudiWindow(QWidget):
         """ Connect to GSM's server and database and will get the cursor. """
 
         # don't forget to also comment load_sql()
-        #self.cursor_ = connect_judi()  # connecting to GSM
-        self.cursor_ = connect_judi2()   # connecting to sqlite
+        self.cursor_ = connect_judi()  # connecting to GSM
+        #self.cursor_ = connect_judi2()   # connecting to sqlite
 
     def _read_settings(self):
 
@@ -231,11 +212,14 @@ class JudiWindow(QWidget):
         except TypeError as e:  # No record found
             self.clear_criteria_fields()
             self.dncTextEdit.setText('No record found. Try again.')
-            print(f'on_grnLineEdit_textChanged: {e} {type(e)}')
+            print(f'on_grnLineEdit_textChanged: {e} - {type(e)}')
 
-        except Exception as e:  # Trying to catch that 'timeout' error
+        except AttributeError as e:  # Trying to catch that 'timeout' error
             self.dncTextEdit.setText('Your sessions has timed-out. Try re-opening Judi.')
-            print(f'on_grnLineEdit_textChanged: {e} {type(e)}')
+            print(f'on_grnLineEdit_textChanged: {e} - {type(e)}')
+
+        except Exception as e:
+            print(f'on_grnLineEdit_textChanged: {e} - {type(e)}')
 
     def search_grn_(self, grn):
         """ Method that will search a record based on the given GRN. """
@@ -305,6 +289,12 @@ class JudiWindow(QWidget):
 
         #print(f'w x h: {self.height()} x {self.width()}')
         pass
+
+    def keyPressEvent(self, event):
+
+        # When the used pressed the shortcut 'Ctr+Q'
+        if event.modifiers() & Qt.ControlModifier and event.key() == Qt.Key_Q:
+            self.close()
 
     def closeEvent(self, event):
 
