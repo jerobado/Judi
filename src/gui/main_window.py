@@ -67,30 +67,19 @@ def connect_judi2():
 # TEST: customizing our combobox
 class JudiComboBox(QComboBox):
 
-    def focusInEvent(self, event):
+    def __init__(self):
 
-        print('combobox focus IN')
+        QComboBox.__init__(self)
+        self.view().installEventFilter(self)
 
-    def focusOutEvent(self, event):
+    def eventFilter(self, obj, event):
 
-        # IDEA: if this widget lost its focus by means of pressing a tab, get the last known selected index :)
-        # FINDINGS: when the dropdown is activated keyPressEvent is not active
-
-        print('combobox focus OUT')
-        #pass
-        #print(event.key(), Qt.Key_A)
-
-        # if self.hasFocus():
-        #     self.setCurrentIndex(self.currentIndex())
-
-        # if event.type() == QEvent.KeyPress and self.hasFocus():
-        #     print('tab?')
-        #     self.setCurrentIndex(self.currentIndex())
-        #print('key?')
-
-    def keyPressEvent(self, event):
-
-        print(f'{event.key()}')
+        if event.type() == QEvent.ShortcutOverride:
+            if event.key() == Qt.Key_Tab:
+                self.hidePopup()
+                self.setCurrentIndex(self.view().currentIndex().row())
+                return True
+        return QComboBox.eventFilter(self, obj, event)
 
 
 class JudiWindow(QWidget):
@@ -114,8 +103,8 @@ class JudiWindow(QWidget):
         self.sentDateEdit = QDateEdit()
         self.trademarkLineEdit = QLineEdit()
         self.countrycodeLineEdit = QLineEdit()
-        self.emailtypeComboBox = QComboBox()
-        #self.emailtypeComboBox = JudiComboBox()
+        #self.emailtypeComboBox = QComboBox()
+        self.emailtypeComboBox = JudiComboBox()
         self.descriptionLineEdit = QLineEdit()
         self.senderLineEdit = QLineEdit()
         self.switchPushButton = QPushButton()
@@ -320,11 +309,3 @@ class JudiWindow(QWidget):
     def closeEvent(self, event):
 
         self._write_settings()
-
-    def focusInEvent(self, event):
-
-        print('Judi in focus?')
-
-    def focusOutEvent(self, event):
-
-        print('Judi out focus?')
