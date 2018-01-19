@@ -8,5 +8,5 @@
 </RCC>
 
 <!-- move resources.qrc (this file) in the root folder before running the command below -->
-<!-- pyrcc5 -o resources/judi_resources.py resources.qrc -->
+<!-- pyrcc5 -o src/resources/judi_resources.py resources.qrc -->
 <!-- then add this line: "from resources import judi_resources" in the main_window.py -->
