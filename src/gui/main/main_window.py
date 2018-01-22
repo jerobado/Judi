@@ -1,30 +1,30 @@
 # Judi Main Window
 
-from PyQt5.QtCore import (QDate,
-                          QSettings,
-                          Qt)
+from PyQt5.QtCore import (Qt,
+                          QDate,
+                          QSettings)
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import (QWidget,
-                             QLineEdit,
-                             QTextEdit,
-                             QLabel,
+from PyQt5.QtWidgets import (QDateEdit,
                              QHBoxLayout,
+                             QLabel,
+                             QLineEdit,
+                             QPushButton,
+                             QTextEdit,
                              QVBoxLayout,
-                             QDateEdit,
-                             QPushButton)
+                             QWidget)
 from src.gui.widgets.combobox import JudiComboBox
-from src.resources.constant import (__version__,
-                                    __appname__,
+from src.resources.constant import (__appname__,
+                                    __version__,
                                     AB_EMAIL_TYPE,
                                     AB_TEMPLATE,
-                                    NON_AB_TEMPLATE,
                                     CONNECTION_STR,
                                     CONNECTION_STR_SQLITE,
+                                    DATE_FORMAT,
+                                    NON_AB_TEMPLATE,
+                                    SEARCH_GRN_SQL,
                                     SETTINGS_GEOMETRY,
                                     STYLESHEET,
-                                    SEARCH_GRN_SQL,
-                                    USERNAME,
-                                    DATE_FORMAT)
+                                    USERNAME)
 from src.resources import judi_resources
 
 
@@ -179,8 +179,8 @@ class JudiWindow(QWidget):
         """ Connect to GSM's server and database and will get the cursor. """
 
         # don't forget to also comment load_sql()
-        self.cursor_ = connect_judi()  # connecting to GSM
-        #self.cursor_ = connect_judi2()   # connecting to sqlite
+        #self.cursor_ = connect_judi()  # connecting to GSM
+        self.cursor_ = connect_judi2()   # connecting to sqlite
 
     def _read_settings(self):
 
