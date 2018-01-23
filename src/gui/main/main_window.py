@@ -17,6 +17,7 @@ from src.resources.constant import (__appname__,
                                     __version__,
                                     AB_EMAIL_TYPE,
                                     AB_TEMPLATE,
+                                    BM_OFFICES,
                                     CONNECTION_STR,
                                     CONNECTION_STR_SQLITE,
                                     DATE_FORMAT,
@@ -179,8 +180,8 @@ class JudiWindow(QWidget):
         """ Connect to GSM's server and database and will get the cursor. """
 
         # don't forget to also comment load_sql()
-        #self.cursor_ = connect_judi()  # connecting to GSM
-        self.cursor_ = connect_judi2()   # connecting to sqlite
+        self.cursor_ = connect_judi()  # connecting to GSM
+        #self.cursor_ = connect_judi2()   # connecting to sqlite
 
     def _read_settings(self):
 
@@ -197,8 +198,14 @@ class JudiWindow(QWidget):
 
                 # Parse the package
                 trademark = record[2]
+                country = record[3]
                 country_code = record[4]
-                agent = record[5]
+
+                # TEST: check if country has BM Office
+                if self.has_bm_office(country):
+                    agent = self.has_bm_office(country)
+                else:
+                    agent = record[5]
 
                 # Deliver the package
                 self.trademarkLineEdit.setText(trademark)
@@ -243,6 +250,11 @@ class JudiWindow(QWidget):
         self.descriptionLineEdit.clear()
         self.senderLineEdit.clear()
         self.recipientLineEdit.clear()
+
+    def has_bm_office(self, country):
+        """ Check if country has a BM Office. """
+
+        return BM_OFFICES.get(country)
 
     def on_criteriaChanged(self):
 
