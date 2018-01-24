@@ -18,6 +18,7 @@ from src.resources.constant import (__appname__,
                                     AB_EMAIL_TYPE,
                                     AB_TEMPLATE,
                                     BM_OFFICES,
+                                    BM_OFFICES_COMPLETER,
                                     CONNECTION_STR,
                                     CONNECTION_STR_SQLITE,
                                     DATE_FORMAT,
@@ -119,6 +120,7 @@ class JudiWindow(QWidget):
 
         self.senderLineEdit.setPlaceholderText('Sender')
         self.senderLineEdit.setObjectName('senderLineEdit')
+        self.senderLineEdit.setCompleter(BM_OFFICES_COMPLETER)
 
         self.switchPushButton.setObjectName('switchPushButton')
         self.switchPushButton.setShortcut('Alt+S')
@@ -127,6 +129,7 @@ class JudiWindow(QWidget):
 
         self.recipientLineEdit.setPlaceholderText('Recipient')
         self.recipientLineEdit.setObjectName('recipientLineEdit')
+        self.recipientLineEdit.setCompleter(BM_OFFICES_COMPLETER)
 
         self.dncTextEdit.setObjectName('dncTextEdit')
         self.dncTextEdit.setPlaceholderText('Document Naming Convention')
@@ -180,8 +183,8 @@ class JudiWindow(QWidget):
         """ Connect to GSM's server and database and will get the cursor. """
 
         # don't forget to also comment load_sql()
-        self.cursor_ = connect_judi()  # connecting to GSM
-        #self.cursor_ = connect_judi2()   # connecting to sqlite
+        #self.cursor_ = connect_judi()  # connecting to GSM
+        self.cursor_ = connect_judi2()   # connecting to sqlite
 
     def _read_settings(self):
 
