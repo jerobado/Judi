@@ -1,5 +1,6 @@
 # Judi Main Window
 
+import pyodbc
 from PyQt5.QtCore import (Qt,
                           QDate,
                           QSettings)
@@ -22,6 +23,10 @@ from src.resources.constant import (__appname__,
                                     CONNECTION_STR,
                                     CONNECTION_STR_SQLITE,
                                     DATE_FORMAT,
+                                    DB_DRIVER,
+                                    DB_DATABASE,
+                                    DB_SERVER,
+                                    DB_TRUSTED_CONN,
                                     NON_AB_TEMPLATE,
                                     SEARCH_GRN_SQL,
                                     SETTINGS_GEOMETRY,
@@ -37,13 +42,17 @@ def connect_judi():
     """
 
     _methodname = 'connect_judi'
-    print(CONNECTION_STR)
+    print(f'{DB_DATABASE}\n{DB_DRIVER}\n{DB_SERVER}\n{DB_TRUSTED_CONN}')
 
     try:
-        import pyodbc
         # Attempting to connect to the server
         print(f'{_methodname}: Connecting to GSM...')
-        conn = pyodbc.connect(CONNECTION_STR)
+        #conn = pyodbc.connect(CONNECTION_STR)
+        conn = pyodbc.connect(driver=DB_DRIVER,
+                              host=DB_SERVER,
+                              database=DB_DATABASE,
+                              user=USERNAME,
+                              trusted_connection=DB_TRUSTED_CONN)
         print(f'{_methodname}: Good! You are now connected to GSM.')
         return conn.cursor()
 
@@ -183,8 +192,8 @@ class JudiWindow(QWidget):
         """ Connect to GSM's server and database and will get the cursor. """
 
         # don't forget to also comment load_sql()
-        #self.cursor_ = connect_judi()  # connecting to GSM
-        self.cursor_ = connect_judi2()   # connecting to sqlite
+        self.cursor_ = connect_judi()  # connecting to GSM
+        #self.cursor_ = connect_judi2()   # connecting to sqlite
 
     def _read_settings(self):
 
@@ -223,6 +232,12 @@ class JudiWindow(QWidget):
             self.clear_criteria_fields()
             self.dncTextEdit.setText('No record found. Try again.')
             print(f'on_grnLineEdit_textChanged: {e} - {type(e)}')
+
+        except pyodbc.OperationalError as e:   # Disconnect error?
+            self.dncTextEdit.setText(f'Reconnecting...')
+            print(f'on_grnLineEdit_textChanged: {e} - {type(e)}')
+            # try reconnecting
+            connect_judi()
 
         except AttributeError as e:  # Trying to catch that 'timeout' error
             self.dncTextEdit.setText('Your sessions has timed-out. Try re-opening Judi.')
