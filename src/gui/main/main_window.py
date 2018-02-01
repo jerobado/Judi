@@ -18,6 +18,7 @@ from src.resources.constant import (__appname__,
                                     __version__,
                                     AB_EMAIL_TYPE,
                                     AB_TEMPLATE,
+                                    BMO,
                                     BM_OFFICES,
                                     BM_OFFICES_COMPLETER,
                                     CONNECTION_STR,
@@ -31,6 +32,7 @@ from src.resources.constant import (__appname__,
                                     SEARCH_GRN_SQL,
                                     SETTINGS_GEOMETRY,
                                     STYLESHEET,
+                                    THIRD_PARTY_AGENTS,
                                     USERNAME)
 from src.resources import judi_resources
 
@@ -212,12 +214,8 @@ class JudiWindow(QWidget):
                 trademark = record[2]
                 country = record[3]
                 country_code = record[4]
-
-                # TEST: check if country has BM Office
-                if self.has_bm_office(country):
-                    agent = self.has_bm_office(country)
-                else:
-                    agent = record[5]
+                agent = self.gipm_agent(gipm_agent=record[5],
+                                        agent_id=int(record[6]))    # converting to INT just in case
 
                 # Deliver the package
                 self.trademarkLineEdit.setText(trademark)
@@ -274,6 +272,14 @@ class JudiWindow(QWidget):
 
         return BM_OFFICES.get(country)
 
+    def gipm_agent(self, gipm_agent, agent_id):
+        """ TEST: retrieving the desired agent based on DNC. """
+
+        if agent_id not in BMO.keys():
+            return gipm_agent
+        else:
+            return 'BM ' + BMO.get(agent_id)
+
     def on_criteriaChanged(self):
 
         self.profiling_date = self.sentDateEdit.date()
@@ -322,7 +328,7 @@ class JudiWindow(QWidget):
 
     def keyPressEvent(self, event):
 
-        # When the used pressed the shortcut 'Ctr+Q'
+        # When the user pressed the keys 'Ctr+Q'
         if event.modifiers() & Qt.ControlModifier and event.key() == Qt.Key_Q:
             self.close()
 
