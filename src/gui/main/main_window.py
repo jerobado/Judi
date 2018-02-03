@@ -14,6 +14,7 @@ from PyQt5.QtWidgets import (QDateEdit,
                              QVBoxLayout,
                              QWidget)
 from src.gui.widgets.combobox import JudiComboBox
+from src.core import judi
 from src.resources.constant import (__appname__,
                                     __version__,
                                     AB_EMAIL_TYPE,
@@ -215,7 +216,7 @@ class JudiWindow(QWidget):
                 country = record[3]
                 country_code = record[4]
                 agent = self.gipm_agent(gipm_agent=record[5],
-                                        agent_id=int(record[6]))    # converting to INT just in case
+                                        agent_id=record[6])
 
                 # Deliver the package
                 self.trademarkLineEdit.setText(trademark)
@@ -234,6 +235,7 @@ class JudiWindow(QWidget):
         except pyodbc.OperationalError as e:   # Disconnect error?
             self.dncTextEdit.setText(f'Reconnecting...')
             print(f'on_grnLineEdit_textChanged: {e} - {type(e)}')
+            # TODO: currently now working
             # try reconnecting
             connect_judi()
 
@@ -242,6 +244,7 @@ class JudiWindow(QWidget):
             print(f'on_grnLineEdit_textChanged: {e} - {type(e)}')
 
         except Exception as e:
+            self.dncTextEdit.setText('Something is bugging me inside. Try reopening Judi.')
             print(f'on_grnLineEdit_textChanged: {e} - {type(e)}')
 
     def search_grn_(self, grn):
