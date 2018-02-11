@@ -7,9 +7,7 @@
  """
 
 import sys
-
 from PyQt5.QtWidgets import QApplication
-
 from src.resources.constant import (__appname__,
                                     __orgname__)
 

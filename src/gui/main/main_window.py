@@ -1,4 +1,4 @@
-# Judi Main Window
+# Judi's main user interface
 
 import pyodbc
 from PyQt5.QtCore import (Qt,
@@ -20,62 +20,13 @@ from src.resources.constant import (__appname__,
                                     AB_EMAIL_TYPE,
                                     AB_TEMPLATE,
                                     BMO,
-                                    BM_OFFICES,
                                     BM_OFFICES_COMPLETER,
-                                    CONNECTION_STR,
-                                    CONNECTION_STR_SQLITE,
                                     DATE_FORMAT,
-                                    DB_DRIVER,
-                                    DB_DATABASE,
-                                    DB_SERVER,
-                                    DB_TRUSTED_CONN,
                                     NON_AB_TEMPLATE,
-                                    SEARCH_GRN_SQL,
                                     SETTINGS_GEOMETRY,
                                     STYLESHEET,
-                                    THIRD_PARTY_AGENTS,
                                     USERNAME)
 from src.resources import judi_resources
-
-
-def connect_judi():
-    """  Method that will connect Judi to the server and its databases. This will return conn.
-
-        return conn.cursor()
-    """
-
-    _methodname = 'connect_judi'
-    print(f'{DB_DATABASE}\n{DB_DRIVER}\n{DB_SERVER}\n{DB_TRUSTED_CONN}')
-
-    try:
-        # Attempting to connect to the server
-        print(f'{_methodname}: Connecting to GSM...')
-        #conn = pyodbc.connect(CONNECTION_STR)
-        conn = pyodbc.connect(driver=DB_DRIVER,
-                              host=DB_SERVER,
-                              database=DB_DATABASE,
-                              user=USERNAME,
-                              trusted_connection=DB_TRUSTED_CONN)
-        print(f'{_methodname}: Good! You are now connected to GSM.')
-        return conn.cursor()
-
-    except Exception as e:
-        print(f'{_methodname}: Connection to GSM failed. Try again.\n{e}')
-
-
-def connect_judi2():
-    """ Thiw will connect to the SQLite database. """
-
-    _methodname = 'connect_judi2'
-
-    try:
-        print(f'{_methodname}: Connecting to SQLite...')
-        import sqlite3
-        conn = sqlite3.connect(CONNECTION_STR_SQLITE)
-        print(f'{_methodname}: Good! You are now connected to SQLite.')
-        return conn.cursor()
-    except Exception as e:
-        print(f'{_methodname}: Connection to SQLite failed. Try again.\n{e}')
 
 
 class JudiWindow(QWidget):
@@ -192,7 +143,10 @@ class JudiWindow(QWidget):
         self.recipientLineEdit.textChanged.connect(self.on_criteriaChanged)
 
     def _gsmconnect(self):
-        """ Connect to GSM's server and database and will get the cursor. """
+        """ Connect to server and database.
+
+            return -> bool
+        """
 
         judi.connect()  # using the core
 
@@ -207,16 +161,16 @@ class JudiWindow(QWidget):
             grn = self.grnLineEdit.text()
 
             if grn:  # has content, perform the search
-                #record = self.search_grn_(grn)
                 record = judi.search(grn)
                 print(f'[JUDI]: result -> {record}')
 
                 # Parse the package
+                # TODO: use dict to retrieve values instead of indices
                 trademark = record[2]
                 country = record[3]
                 country_code = record[4]
-                agent = self.gipm_agent(gipm_agent=record[5],
-                                        agent_id=record[6])
+                agent = self.determine_agent(agent=record[5],
+                                             agent_id=record[6])
 
                 # Deliver the package
                 self.trademarkLineEdit.setText(trademark)
@@ -233,33 +187,17 @@ class JudiWindow(QWidget):
             print(f'on_grnLineEdit_textChanged: {e} - {type(e)}')
 
         except pyodbc.OperationalError as e:   # Disconnect error?
-            self.dncTextEdit.setText(f'Reconnecting...')
+            self.dncTextEdit.setText('Session has timed-out. Try re-opening the app.')
             print(f'on_grnLineEdit_textChanged: {e} - {type(e)}')
-            # TODO: currently now working
-            # try reconnecting
-            connect_judi()
+            # TODO: create an auto recon when this error happens
 
-        except AttributeError as e:  # Trying to catch that 'timeout' error
-            self.dncTextEdit.setText('Your sessions has timed-out. Try re-opening Judi.')
+        except AttributeError as e:
+            self.dncTextEdit.setText('AttributeError. Try re-opening the app.')
             print(f'on_grnLineEdit_textChanged: {e} - {type(e)}')
 
         except Exception as e:
-            self.dncTextEdit.setText('Something is bugging me inside. Try reopening Judi.')
+            self.dncTextEdit.setText('Judi is not feeling well. Try re-opening the app.')
             print(f'on_grnLineEdit_textChanged: {e} - {type(e)}')
-
-    def search_grn_(self, grn):
-        """ Method that will search a record based on the given GRN. """
-
-        print(f'Searching for {grn}...')
-        grn = (grn,)    # Tuplelized :)
-
-        # Execute search query
-        self.cursor_.execute(SEARCH_GRN_SQL, grn)
-
-        # Get the retrieved record
-        record = self.cursor_.fetchone()
-        print(f'Record found! -> {record}')
-        return record
 
     def clear_criteria_fields(self):
         """ Method that will clear the content of the input fields. """
@@ -270,18 +208,13 @@ class JudiWindow(QWidget):
         self.senderLineEdit.clear()
         self.recipientLineEdit.clear()
 
-    def has_bm_office(self, country):
-        """ Check if country has a BM Office. """
+    def determine_agent(self, agent, agent_id):
+        """ Determine if the current agent is 3rd party or part of the Firm. """
 
-        return BM_OFFICES.get(country)
-
-    def gipm_agent(self, gipm_agent, agent_id):
-        """ TEST: retrieving the desired agent based on DNC. """
-
-        if agent_id not in BMO.keys():
-            return gipm_agent
-        else:
-            return 'BM ' + BMO.get(agent_id)
+        baker = BMO.get(agent_id)
+        if baker:
+            return f'BM {baker}'
+        return agent
 
     def on_criteriaChanged(self):
 
@@ -289,7 +222,6 @@ class JudiWindow(QWidget):
 
         combobox_index = self.emailtypeComboBox.currentIndex()
         if combobox_index:
-            # If Abbott
             profiling_text = AB_TEMPLATE.substitute(sent=self.profiling_date.toString(DATE_FORMAT),
                                                     trademark=self.trademarkLineEdit.text(),
                                                     countrycode=self.countrycodeLineEdit.text(),
@@ -298,7 +230,6 @@ class JudiWindow(QWidget):
                                                     sender=self.senderLineEdit.text(),
                                                     recipient=self.recipientLineEdit.text())
         else:
-            # If Non-Abbott
             profiling_text = NON_AB_TEMPLATE.substitute(sent=self.profiling_date.toString(DATE_FORMAT),
                                                         trademark=self.trademarkLineEdit.text(),
                                                         countrycode=self.countrycodeLineEdit.text(),
@@ -310,7 +241,7 @@ class JudiWindow(QWidget):
         self.clipboard.setText(profiling_text)
 
     def on_switchPushButton_clicked(self):
-        """ Event handler that will 'switch' the entries of the Sender and Recipient LineEdits. """
+        """ Event handler that will 'switch' the entries of the Sender and Recipient fields. """
 
         # Get the current values of the fields
         sender = self.senderLineEdit.text()
@@ -319,10 +250,6 @@ class JudiWindow(QWidget):
         # Perform the simple switching of values
         self.senderLineEdit.setText(recipient)
         self.recipientLineEdit.setText(sender)
-
-    def _write_settings(self):
-
-        self.settings.setValue(SETTINGS_GEOMETRY, self.saveGeometry())
 
     def resizeEvent(self, event):
 
@@ -338,3 +265,7 @@ class JudiWindow(QWidget):
     def closeEvent(self, event):
 
         self._write_settings()
+
+    def _write_settings(self):
+
+        self.settings.setValue(SETTINGS_GEOMETRY, self.saveGeometry())

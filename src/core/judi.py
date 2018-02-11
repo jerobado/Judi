@@ -1,13 +1,12 @@
 """
-Soul and core operations of Judi
+    Core operations of Judi
 
-Usage:
-    > import judi
-    > judi.connect()
-    True
-    > judi.search('5134412')
-    ('5134412', 'Trademark', 'AWESOME TRADEMARK', 'China', 'CHN', 'Super Awesome Agent', '1111')
-
+    Usage:
+        > import judi
+        > judi.connect()
+        True
+        > judi.search('5134412')
+        ('5134412', 'Trademark', 'AWESOME TRADEMARK', 'China', 'CHN', 'Super Awesome Agent', '1111')
 """
 
 import sqlite3
@@ -51,7 +50,7 @@ def connect():
         return True
 
     except Exception as e:
-        print(f'judi: {e}')
+        print(f'[JUDI]: {e}')
 
 
 def search(grn):
