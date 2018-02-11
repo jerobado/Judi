@@ -194,9 +194,7 @@ class JudiWindow(QWidget):
     def _gsmconnect(self):
         """ Connect to GSM's server and database and will get the cursor. """
 
-        # don't forget to also comment load_sql()
-        self.cursor_ = connect_judi()  # connecting to GSM
-        #self.cursor_ = connect_judi2()   # connecting to sqlite
+        judi.connect()  # using the core
 
     def _read_settings(self):
 
@@ -209,7 +207,9 @@ class JudiWindow(QWidget):
             grn = self.grnLineEdit.text()
 
             if grn:  # has content, perform the search
-                record = self.search_grn_(grn)
+                #record = self.search_grn_(grn)
+                record = judi.search(grn)
+                print(f'[JUDI]: result -> {record}')
 
                 # Parse the package
                 trademark = record[2]
