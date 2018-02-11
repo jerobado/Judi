@@ -11,6 +11,7 @@
 
 import sqlite3
 import pyodbc
+from collections import namedtuple
 from src.resources.constant import (CONNECTION_STR_SQLITE,
                                     DB_DATABASE,
                                     DB_DRIVER,
@@ -56,9 +57,11 @@ def connect():
 def search(grn):
     """ Search record in GIPM using the given GRN.
 
-    return -> tuple
+    return -> namedtuple
     """
+
+    GIPMRecord = namedtuple('GIPMRecord', 'grn, module, trademark, country, countrycode, agent, agentid')
 
     grn = (grn,)
     CURSOR.execute(SEARCH_GRN_SQL, grn)
-    return CURSOR.fetchone()
+    return GIPMRecord._make(CURSOR.fetchone())

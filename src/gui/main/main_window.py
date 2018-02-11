@@ -159,28 +159,20 @@ class JudiWindow(QWidget):
         try:
             # Get the package to deliver
             grn = self.grnLineEdit.text()
-
             if grn:  # has content, perform the search
                 record = judi.search(grn)
                 print(f'[JUDI]: result -> {record}')
 
-                # Parse the package
-                # TODO: use dict to retrieve values instead of indices
-                trademark = record[2]
-                country = record[3]
-                country_code = record[4]
-                agent = self.determine_agent(agent=record[5],
-                                             agent_id=record[6])
-
                 # Deliver the package
-                self.trademarkLineEdit.setText(trademark)
-                self.countrycodeLineEdit.setText(country_code)
-                self.senderLineEdit.setText(agent)
-
+                self.trademarkLineEdit.setText(record.trademark)
+                self.countrycodeLineEdit.setText(record.countrycode)
+                self.senderLineEdit.setText(self.determine_agent(agent=record.agent,
+                                                                 agent_id=record.agentid))
             else:   # has no content
                 self.clear_criteria_fields()
                 self.dncTextEdit.clear()
 
+        # [] TODO: group related exceptions
         except TypeError as e:  # No record found
             self.clear_criteria_fields()
             self.dncTextEdit.setText('No record found. Try again.')
@@ -189,7 +181,7 @@ class JudiWindow(QWidget):
         except pyodbc.OperationalError as e:   # Disconnect error?
             self.dncTextEdit.setText('Session has timed-out. Try re-opening the app.')
             print(f'on_grnLineEdit_textChanged: {e} - {type(e)}')
-            # TODO: create an auto recon when this error happens
+            # [] TODO: create an auto recon when this error happens
 
         except AttributeError as e:
             self.dncTextEdit.setText('AttributeError. Try re-opening the app.')
@@ -219,26 +211,27 @@ class JudiWindow(QWidget):
     def on_criteriaChanged(self):
 
         self.profiling_date = self.sentDateEdit.date()
+        dnc = self.generate_dnc(self.emailtypeComboBox.currentIndex())
+        self.dncTextEdit.setText(dnc)
+        self.clipboard.setText(dnc)
 
-        combobox_index = self.emailtypeComboBox.currentIndex()
-        if combobox_index:
-            profiling_text = AB_TEMPLATE.substitute(sent=self.profiling_date.toString(DATE_FORMAT),
-                                                    trademark=self.trademarkLineEdit.text(),
-                                                    countrycode=self.countrycodeLineEdit.text(),
-                                                    emailtype=self.emailtypeComboBox.currentText(),
-                                                    description=self.descriptionLineEdit.text(),
-                                                    sender=self.senderLineEdit.text(),
-                                                    recipient=self.recipientLineEdit.text())
-        else:
-            profiling_text = NON_AB_TEMPLATE.substitute(sent=self.profiling_date.toString(DATE_FORMAT),
-                                                        trademark=self.trademarkLineEdit.text(),
-                                                        countrycode=self.countrycodeLineEdit.text(),
-                                                        description=self.descriptionLineEdit.text(),
-                                                        sender=self.senderLineEdit.text(),
-                                                        recipient=self.recipientLineEdit.text())
+    def generate_dnc(self, index):
 
-        self.dncTextEdit.setText(profiling_text)
-        self.clipboard.setText(profiling_text)
+        if not index:
+            return NON_AB_TEMPLATE.substitute(sent=self.profiling_date.toString(DATE_FORMAT),
+                                              trademark=self.trademarkLineEdit.text(),
+                                              countrycode=self.countrycodeLineEdit.text(),
+                                              description=self.descriptionLineEdit.text(),
+                                              sender=self.senderLineEdit.text(),
+                                              recipient=self.recipientLineEdit.text())
+
+        return AB_TEMPLATE.substitute(sent=self.profiling_date.toString(DATE_FORMAT),
+                                      trademark=self.trademarkLineEdit.text(),
+                                      countrycode=self.countrycodeLineEdit.text(),
+                                      emailtype=self.emailtypeComboBox.currentText(),
+                                      description=self.descriptionLineEdit.text(),
+                                      sender=self.senderLineEdit.text(),
+                                      recipient=self.recipientLineEdit.text())
 
     def on_switchPushButton_clicked(self):
         """ Event handler that will 'switch' the entries of the Sender and Recipient fields. """
