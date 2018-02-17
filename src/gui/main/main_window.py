@@ -165,7 +165,7 @@ class JudiWindow(QWidget):
 
                 # Deliver the package
                 self.trademarkLineEdit.setText(record.trademark)
-                self.countrycodeLineEdit.setText(record.countrycode)
+                self.countrycodeLineEdit.setText(str(record.countrycode).rstrip())   # using str.rstrip() to remove extra space for 2-letter coded countries
                 self.senderLineEdit.setText(self.determine_agent(agent=record.agent,
                                                                  agent_id=record.agentid))
             else:   # has no content
@@ -204,9 +204,7 @@ class JudiWindow(QWidget):
         """ Determine if the current agent is 3rd party or part of the Firm. """
 
         baker = BMO.get(agent_id)
-        if baker:
-            return f'BM {baker}'
-        return agent
+        return f'BM {baker}' if baker else agent
 
     def on_criteriaChanged(self):
 
