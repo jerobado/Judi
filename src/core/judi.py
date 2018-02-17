@@ -17,6 +17,7 @@ from src.resources.constant import (CONNECTION_STR_SQLITE,
                                     DB_DRIVER,
                                     DB_SERVER,
                                     DB_TRUSTED_CONN,
+                                    GIPM_RECORD,
                                     SEARCH_GRN_SQL,
                                     USERNAME)
 
@@ -60,8 +61,6 @@ def search(grn):
     return -> namedtuple
     """
 
-    GIPMRecord = namedtuple('GIPMRecord', 'grn, module, trademark, country, countrycode, agent, agentid')
-
     grn = (grn,)
     CURSOR.execute(SEARCH_GRN_SQL, grn)
-    return GIPMRecord._make(CURSOR.fetchone())
+    return GIPM_RECORD._make(CURSOR.fetchone())
