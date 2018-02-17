@@ -3,7 +3,7 @@
     Interface: GUI (PyQt5)
     Language: Python 3.6.3
     Created: 19 Dec 2017 7:45 PM
-    Author: mokachokokarbon
+    Author: Jero Bado
  """
 
 import sys
