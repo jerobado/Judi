@@ -11,15 +11,15 @@
 
 import sqlite3
 import pyodbc
-from collections import namedtuple
 from src.resources.constant import (CONNECTION_STR_SQLITE,
                                     DB_DATABASE,
                                     DB_DRIVER,
                                     DB_SERVER,
+                                    DB_PASSWORD,
                                     DB_TRUSTED_CONN,
+                                    DB_USERNAME,
                                     GIPM_RECORD,
-                                    SEARCH_GRN_SQL,
-                                    USERNAME)
+                                    SEARCH_GRN_SQL)
 
 CURSOR = None
 
@@ -33,13 +33,14 @@ def connect():
     global CURSOR
 
     try:
+        # [x] TODO: update DB credentials
         # Connecting to GSM
         # print(f'[JUDI]: Connecting to GSM...')
         # conn = pyodbc.connect(driver=DB_DRIVER,
         #                       host=DB_SERVER,
         #                       database=DB_DATABASE,
-        #                       user=USERNAME,
-        #                       trusted_connection=DB_TRUSTED_CONN)
+        #                       user=DB_USERNAME,
+        #                       pwd=DB_PASSWORD)
         # CURSOR = conn.cursor()
         # print(f'[JUDI]: Good! You are now connected to GSM.')
         # return True
