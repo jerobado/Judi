@@ -21,6 +21,7 @@ from src.resources.constant import (__appname__,
                                     AB_TEMPLATE,
                                     BMO,
                                     BM_OFFICES_COMPLETER,
+                                    CC,
                                     DATE_FORMAT,
                                     NON_AB_TEMPLATE,
                                     SETTINGS_GEOMETRY,
@@ -165,7 +166,7 @@ class JudiWindow(QWidget):
 
                 # Deliver the package
                 self.trademarkLineEdit.setText(record.trademark)
-                self.countrycodeLineEdit.setText(str(record.countrycode).rstrip())   # using str.rstrip() to remove extra space for 2-letter coded countries
+                self.countrycodeLineEdit.setText(CC.get(record.countryid))
                 self.senderLineEdit.setText(self.determine_agent(agent=record.agent,
                                                                  agent_id=record.agentid))
             else:   # has no content
