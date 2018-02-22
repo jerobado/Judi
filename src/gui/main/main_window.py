@@ -160,10 +160,9 @@ class JudiWindow(QWidget):
         try:
             # Get the package to deliver
             grn = self.grnLineEdit.text()
-            if grn:  # has content, perform the search
-                record = judi.search(grn)
-                print(f'[JUDI]: result -> {record}')
-
+            record = judi.search(grn)   # perform the search
+            print(f'[JUDI]: result -> {record}')
+            if record:
                 # Deliver the package
                 self.trademarkLineEdit.setText(record.trademark)
                 self.countrycodeLineEdit.setText(CC.get(record.countryid))
