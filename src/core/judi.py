@@ -20,7 +20,7 @@ from src.resources.constant import (CONNECTION_STR_SQLITE,
                                     DB_TRUSTED_CONN,
                                     DB_USERNAME,
                                     GIPM_RECORD,
-                                    SEARCH_GRN_SQL)
+                                    SEARCH_SQL_FILE)
 
 CURSOR = None
 
@@ -65,5 +65,5 @@ def search(grn):
     """
 
     grn = (grn,)
-    CURSOR.execute(SEARCH_GRN_SQL, grn)
+    CURSOR.execute(SEARCH_SQL_FILE, grn)
     return GIPM_RECORD._make(CURSOR.fetchone())

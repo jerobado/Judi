@@ -25,7 +25,7 @@ from src.resources.constant import (__appname__,
                                     DATE_FORMAT,
                                     NON_AB_TEMPLATE,
                                     SETTINGS_GEOMETRY,
-                                    STYLESHEET,
+                                    STYLE_QSS_FILE,
                                     USERNAME)
 from src.resources import judi_resources
 
@@ -101,7 +101,7 @@ class JudiWindow(QWidget):
         self.setWindowTitle(f'{__appname__} {__version__} - {USERNAME}')
         self.setObjectName('JudiWindow')
         self.resize(616, 110)   # width, height
-        self.setStyleSheet(STYLESHEET)
+        self.setStyleSheet(STYLE_QSS_FILE)
         self.setTabOrder(self.senderLineEdit, self.recipientLineEdit)
 
     def _layout(self):
