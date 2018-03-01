@@ -20,8 +20,6 @@ APP.setApplicationName(__appname__)
 def check_environment():
     """ Check what current environment is Judi running. """
 
-    print(__file__)
-
     frozen = 'not'
     if getattr(sys, 'frozen', False):
         # Judi is now running live and frozen! #chills

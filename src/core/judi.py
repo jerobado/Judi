@@ -36,7 +36,6 @@ def connect():
     try:
         # Connecting to GSM
         print(f'[JUDI]: Connecting to GSM...')
-        print(f'{DB_DRIVER}\n{DB_SERVER}\n{DB_DATABASE}')
         conn = pyodbc.connect(driver=DB_DRIVER,
                               server=DB_SERVER,
                               database=DB_DATABASE,

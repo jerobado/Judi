@@ -67,6 +67,7 @@ class JudiWindow(QWidget):
         self.grnLineEdit.setObjectName('grnLineEdit')
 
         self.sentDateEdit.setObjectName('sentDateEdit')
+        self.sentDateEdit.setDisplayFormat('dd-MMM-yy')
         self.sentDateEdit.setDate(self.profiling_date)
         self.sentDateEdit.setCalendarPopup(True)
 
@@ -159,7 +160,7 @@ class JudiWindow(QWidget):
 
         try:
             # Get the package to deliver
-            grn = self.grnLineEdit.text()
+            grn = self.grnLineEdit.text().strip()
             record = judi.search(grn)   # perform the search
             print(f'[JUDI]: result -> {record}')
             if record:
