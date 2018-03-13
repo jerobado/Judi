@@ -2,7 +2,7 @@ CHANGELOG
 ---------
 All notable changes to this project will be documented on this file.
 
-**Patch 0.1.x**
+**Patch 0.1.18**
 
 * Features
     * Search _GIPM_ record by simply entering its _Global Record Number_.
