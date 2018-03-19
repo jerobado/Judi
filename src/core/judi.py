@@ -14,15 +14,28 @@ import pyodbc
 from src.resources.constant import (CONNECTION_STR_SQLITE,
                                     DB_APP,
                                     DB_DATABASE,
-                                    DB_DRIVER,
                                     DB_SERVER,
                                     DB_PASSWORD,
-                                    DB_TRUSTED_CONN,
                                     DB_USERNAME,
                                     GIPM_RECORD,
+                                    LOCAL_DRIVERS,
+                                    ODBC_DRIVERS,
                                     SEARCH_SQL_FILE)
 
 CURSOR = None
+
+
+def get_latest_odbc_driver():
+
+    # Get common database driver
+    common_drivers = set(ODBC_DRIVERS).intersection(LOCAL_DRIVERS)
+    print(f'[JUDI]: common ODBC drivers: {common_drivers}')
+
+    # Get the latest ODBC driver
+    for driver in ODBC_DRIVERS:
+        if driver in common_drivers:
+            print(f'[JUDI]: latest installed ODBC driver is {driver}')
+            return driver
 
 
 def connect():
@@ -34,6 +47,8 @@ def connect():
     global CURSOR
 
     try:
+        DB_DRIVER = get_latest_odbc_driver()
+
         # Connecting to GSM
         print(f'[JUDI]: Connecting to GSM...')
         conn = pyodbc.connect(driver=DB_DRIVER,
