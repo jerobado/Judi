@@ -29,12 +29,12 @@ def get_latest_odbc_driver():
 
     # Get common database driver
     common_drivers = set(ODBC_DRIVERS).intersection(LOCAL_DRIVERS)
-    print(f'[JUDI]: common ODBC drivers: {common_drivers}')
+    print(f'[JUDI]: installed ODBC driver(s): {common_drivers}')
 
     # Get the latest ODBC driver
     for driver in ODBC_DRIVERS:
         if driver in common_drivers:
-            print(f'[JUDI]: latest installed ODBC driver is {driver}')
+            print(f'[JUDI]: using latest ODBC driver: {driver}')
             return driver
 
 
@@ -50,23 +50,23 @@ def connect():
         DB_DRIVER = get_latest_odbc_driver()
 
         # Connecting to GSM
-        print(f'[JUDI]: Connecting to GSM...')
-        conn = pyodbc.connect(driver=DB_DRIVER,
-                              server=DB_SERVER,
-                              database=DB_DATABASE,
-                              uid=DB_USERNAME,
-                              pwd=DB_PASSWORD,
-                              app=DB_APP)
-        CURSOR = conn.cursor()
-        print(f'[JUDI]: Good! You are now connected to GSM.')
-        return True
+        # print(f'[JUDI]: Connecting to GSM...')
+        # conn = pyodbc.connect(driver=DB_DRIVER,
+        #                       server=DB_SERVER,
+        #                       database=DB_DATABASE,
+        #                       uid=DB_USERNAME,
+        #                       pwd=DB_PASSWORD,
+        #                       app=DB_APP)
+        # CURSOR = conn.cursor()
+        # print(f'[JUDI]: Good! You are now connected to GSM.')
+        # return True
 
         # Connecting to SQLite
-        # print(f'[JUDI]: Connecting to SQLite')
-        # conn = sqlite3.connect(CONNECTION_STR_SQLITE)
-        # print(f'[JUDI]: Good! You are now connected to SQLite')
-        # CURSOR = conn.cursor()
-        # return True
+        print(f'[JUDI]: Connecting to SQLite')
+        conn = sqlite3.connect(CONNECTION_STR_SQLITE)
+        print(f'[JUDI]: Good! You are now connected to SQLite')
+        CURSOR = conn.cursor()
+        return True
 
     except Exception as e:
         print(f'[JUDI]: {e}')
