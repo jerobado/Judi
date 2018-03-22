@@ -8,12 +8,14 @@ _Release Date: 1 May 2018 (tentative)_
 
 * Issues/enhancements
     - [x] Fix the ODBC driver not found error
+    - [ ] Add commonly use _Descriptions_
     - [ ] Do not auto-copy if no record is found
     - [ ] Implement a recon mekan when the session has timed-out 
 
 * Killa features
     - [ ] Auto-populate of email type based on client
-    - [ ] Highlight portion of text in the dncTextEdit based on the currrently edited fields 
+    - [ ] Highlight portion of text in the dncTextEdit based on the currently edited fields
+    - [ ] Resizing of dncLineEdit 
 
 
 **Patch 0.1.18**
