@@ -32,8 +32,8 @@ QLabel {
 }
 
 #descriptionLineEdit {
-    width: 110px;
-    max-width: 110px;
+    width: 200px;
+    /* max-width: 200px; */
     background-color: #FCF3CF;
 }
 
