@@ -14,8 +14,8 @@ _Release Date: 1 May 2018 (tentative)_
 
 * Killa features
     - [ ] Auto-populate of email type based on client
-    - [ ] Highlight portion of text in the dncTextEdit based on the currently edited fields
     - [ ] Resizing of dncLineEdit 
+    - [ ] Highlight portion of text in the dncTextEdit based on the currently edited fields 
 
 
 **Patch 0.1.18**
