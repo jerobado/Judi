@@ -20,10 +20,11 @@ from src.resources.constant import (__appname__,
                                     AB_EMAIL_TYPE,
                                     AB_TEMPLATE,
                                     BMO,
-                                    BM_OFFICES_COMPLETER,
                                     CC,
                                     DATE_FORMAT,
+                                    DESCRIPTION_COMPLETER,
                                     NON_AB_TEMPLATE,
+                                    SENDER_RECIPIENT_COMPLETER,
                                     SETTINGS_GEOMETRY,
                                     STYLE_QSS_FILE,
                                     USERNAME)
@@ -82,10 +83,11 @@ class JudiWindow(QWidget):
 
         self.descriptionLineEdit.setPlaceholderText('Brief Description')
         self.descriptionLineEdit.setObjectName('descriptionLineEdit')
+        self.descriptionLineEdit.setCompleter(DESCRIPTION_COMPLETER)
 
         self.senderLineEdit.setPlaceholderText('Sender')
         self.senderLineEdit.setObjectName('senderLineEdit')
-        self.senderLineEdit.setCompleter(BM_OFFICES_COMPLETER)
+        self.senderLineEdit.setCompleter(SENDER_RECIPIENT_COMPLETER)
 
         self.switchPushButton.setObjectName('switchPushButton')
         self.switchPushButton.setShortcut('Alt+S')
@@ -94,7 +96,7 @@ class JudiWindow(QWidget):
 
         self.recipientLineEdit.setPlaceholderText('Recipient')
         self.recipientLineEdit.setObjectName('recipientLineEdit')
-        self.recipientLineEdit.setCompleter(BM_OFFICES_COMPLETER)
+        self.recipientLineEdit.setCompleter(SENDER_RECIPIENT_COMPLETER)
 
         self.dncTextEdit.setObjectName('dncTextEdit')
         self.dncTextEdit.setPlaceholderText('Document Naming Convention')
