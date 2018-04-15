@@ -8,14 +8,12 @@ _Release Date: 1 May 2018 (tentative)_
 
 * Feedback
     * Added commonly use _Basic Description_, _Sender_, and _Recipient_ in the `description`, `sender` and `recipient` fields respectively.
-        * Data Verification Request (DVR)
-        * Data Verification Completed (DVC)
-        * Abbott-AMO
-        * Abbott-AP
-        * Abbott-CFR
-        * Abbott-EPD
-        * Abbott-EPD India
-        * GIPSC
+
+* Shorcuts
+    * Added `F5` shortcut key to clear the input fields
+
+* UI
+    * Remove the GRN label and replace it with the list of modules the app is currently searching
 
 
 **Patch 0.2**
