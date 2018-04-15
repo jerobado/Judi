@@ -49,6 +49,7 @@ class JudiWindow(QWidget):
 
         self.grnLabel = QLabel()
         self.grnLineEdit = QLineEdit()
+        self.modulesLabel = QLabel()
         self.sentDateEdit = QDateEdit()
         self.trademarkLineEdit = QLineEdit()
         self.countrycodeLineEdit = QLineEdit()
@@ -64,8 +65,11 @@ class JudiWindow(QWidget):
         self.grnLabel.setText('&GRN:')
         self.grnLabel.setBuddy(self.grnLineEdit)
 
-        self.grnLineEdit.setPlaceholderText('Trademarks')
+        self.grnLineEdit.setPlaceholderText('GRN')
         self.grnLineEdit.setObjectName('grnLineEdit')
+
+        self.modulesLabel.setText('Trademarks, Disputes, Searches')
+        self.modulesLabel.setObjectName('modulesLabel')
 
         self.sentDateEdit.setObjectName('sentDateEdit')
         self.sentDateEdit.setDisplayFormat('dd-MMM-yy')
@@ -110,8 +114,9 @@ class JudiWindow(QWidget):
     def _layout(self):
 
         first_layer = QHBoxLayout()
-        first_layer.addWidget(self.grnLabel)
+        #first_layer.addWidget(self.grnLabel)
         first_layer.addWidget(self.grnLineEdit)
+        first_layer.addWidget(self.modulesLabel)
         first_layer.addStretch()
 
         second_layer = QHBoxLayout()
@@ -255,6 +260,12 @@ class JudiWindow(QWidget):
         # When the user pressed the keys 'Ctr+Q'
         if event.modifiers() & Qt.ControlModifier and event.key() == Qt.Key_Q:
             self.close()
+
+        # 'F5' clear fields
+        if event.key() == Qt.Key_F5:
+            self.clear_criteria_fields()
+            self.grnLineEdit.clear()
+            self.dncTextEdit.clear()
 
     def closeEvent(self, event):
 
