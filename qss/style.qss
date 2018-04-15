@@ -1,5 +1,5 @@
 QLabel {
-    color: black
+    color: black;
 }
 
 #JudiWindow {
@@ -9,6 +9,11 @@ QLabel {
 #grnLineEdit {
     width: 75px;
     max-width: 75px;
+}
+
+#modulesLabel {
+    font-style: italic;
+    color: #8C8C8C;
 }
 
 #sentDateEdit {
@@ -32,7 +37,7 @@ QLabel {
 }
 
 #descriptionLineEdit {
-    width: 200px;
+    width: 100px;
     /* max-width: 200px; */
     background-color: #FCF3CF;
 }
