@@ -21,12 +21,14 @@ from src.resources.constant import (__appname__,
                                     AB_TEMPLATE,
                                     BMO,
                                     CC,
+                                    COUNTRY_COMPLETER,
                                     DATE_FORMAT,
                                     DESCRIPTION_COMPLETER,
                                     NON_AB_TEMPLATE,
-                                    SENDER_RECIPIENT_COMPLETER,
+                                    OFFICE_COMPLETER,
                                     SETTINGS_GEOMETRY,
                                     STYLE_QSS_FILE,
+                                    TRADEMARK_COMPLETER,
                                     USERNAME)
 from src.resources import judi_resources
 
@@ -78,9 +80,11 @@ class JudiWindow(QWidget):
 
         self.trademarkLineEdit.setPlaceholderText('Trademark')
         self.trademarkLineEdit.setObjectName('trademarkLineEdit')
+        self.trademarkLineEdit.setCompleter(TRADEMARK_COMPLETER)
 
         self.countrycodeLineEdit.setPlaceholderText('CC')
         self.countrycodeLineEdit.setObjectName('countrycodeLineEdit')
+        self.countrycodeLineEdit.setCompleter(COUNTRY_COMPLETER)
 
         self.emailtypeComboBox.addItems(AB_EMAIL_TYPE)
         self.emailtypeComboBox.setObjectName('emailtypeComboBox')
@@ -91,7 +95,7 @@ class JudiWindow(QWidget):
 
         self.senderLineEdit.setPlaceholderText('Sender')
         self.senderLineEdit.setObjectName('senderLineEdit')
-        self.senderLineEdit.setCompleter(SENDER_RECIPIENT_COMPLETER)
+        self.senderLineEdit.setCompleter(OFFICE_COMPLETER)
 
         self.switchPushButton.setObjectName('switchPushButton')
         self.switchPushButton.setShortcut('Alt+S')
@@ -100,7 +104,7 @@ class JudiWindow(QWidget):
 
         self.recipientLineEdit.setPlaceholderText('Recipient')
         self.recipientLineEdit.setObjectName('recipientLineEdit')
-        self.recipientLineEdit.setCompleter(SENDER_RECIPIENT_COMPLETER)
+        self.recipientLineEdit.setCompleter(OFFICE_COMPLETER)
 
         self.dncTextEdit.setObjectName('dncTextEdit')
         self.dncTextEdit.setPlaceholderText('Document Naming Convention')
