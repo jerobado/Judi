@@ -46,6 +46,7 @@ class JudiWindow(QWidget):
         self._connections()
         self._gsmconnect()
         self._read_settings()
+        self.AUTOCOPY = True
 
     def _widgets(self):
 
@@ -175,6 +176,7 @@ class JudiWindow(QWidget):
             record = judi.search(grn)   # perform the search
             print(f'[JUDI]: result -> {record}')
             if record:
+                self.AUTOCOPY = True
                 # Deliver the package
                 self.trademarkLineEdit.setText(record.trademark)
                 self.countrycodeLineEdit.setText(CC.get(record.countryid))
@@ -186,6 +188,8 @@ class JudiWindow(QWidget):
 
         # [] TODO: group related exceptions
         except TypeError as e:  # No record found
+            self.AUTOCOPY = False
+            print(self.AUTOCOPY)
             self.clear_criteria_fields()
             self.dncTextEdit.setText('No record found. Try again.')
             print(f'on_grnLineEdit_textChanged: {e} - {type(e)}')
@@ -223,7 +227,9 @@ class JudiWindow(QWidget):
         self.profiling_date = self.sentDateEdit.date()
         dnc = self.generate_dnc(self.emailtypeComboBox.currentIndex())
         self.dncTextEdit.setText(dnc)
-        self.clipboard.setText(dnc)
+        print(f'on_criteriaChanged -> self.AUTOCOPY: {self.AUTOCOPY}')
+        if self.AUTOCOPY:
+            self.clipboard.setText(dnc)
 
     def generate_dnc(self, index):
 
