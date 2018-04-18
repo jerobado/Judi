@@ -46,7 +46,7 @@ class JudiWindow(QWidget):
         self._connections()
         self._gsmconnect()
         self._read_settings()
-        self.AUTOCOPY = True
+        self.AUTOCOPY = False
 
     def _widgets(self):
 
@@ -119,7 +119,6 @@ class JudiWindow(QWidget):
     def _layout(self):
 
         first_layer = QHBoxLayout()
-        #first_layer.addWidget(self.grnLabel)
         first_layer.addWidget(self.grnLineEdit)
         first_layer.addWidget(self.modulesLabel)
         first_layer.addStretch()
@@ -174,22 +173,24 @@ class JudiWindow(QWidget):
             # Get the package to deliver
             grn = self.grnLineEdit.text().strip()
             record = judi.search(grn)   # perform the search
-            print(f'[JUDI]: result -> {record}')
+            print(f'[JUDI]: {record}')
             if record:
                 self.AUTOCOPY = True
+                print(f'on record found: self.AUTOCOPY -> {self.AUTOCOPY}')
                 # Deliver the package
                 self.trademarkLineEdit.setText(record.trademark)
                 self.countrycodeLineEdit.setText(CC.get(record.countryid))
                 self.senderLineEdit.setText(self.determine_agent(agent=record.agent,
                                                                  agent_id=record.agentid))
             else:   # has no content
+                self.AUTOCOPY = False
                 self.clear_criteria_fields()
                 self.dncTextEdit.clear()
 
         # [] TODO: group related exceptions
         except TypeError as e:  # No record found
+            # [x] TODO: refine where to place AUTOCOPY
             self.AUTOCOPY = False
-            print(self.AUTOCOPY)
             self.clear_criteria_fields()
             self.dncTextEdit.setText('No record found. Try again.')
             print(f'on_grnLineEdit_textChanged: {e} - {type(e)}')
@@ -227,7 +228,7 @@ class JudiWindow(QWidget):
         self.profiling_date = self.sentDateEdit.date()
         dnc = self.generate_dnc(self.emailtypeComboBox.currentIndex())
         self.dncTextEdit.setText(dnc)
-        print(f'on_criteriaChanged -> self.AUTOCOPY: {self.AUTOCOPY}')
+        print(f'on_criteriaChanged: self.AUTOCOPY -> {self.AUTOCOPY}')
         if self.AUTOCOPY:
             self.clipboard.setText(dnc)
 
@@ -273,6 +274,7 @@ class JudiWindow(QWidget):
 
         # 'F5' clear fields
         if event.key() == Qt.Key_F5:
+            self.AUTOCOPY = False
             self.clear_criteria_fields()
             self.grnLineEdit.clear()
             self.dncTextEdit.clear()
