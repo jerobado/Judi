@@ -81,3 +81,9 @@ def search(grn):
     grn = (grn,)
     CURSOR.execute(SEARCH_SQL_FILE, grn)
     return GIPM_RECORD._make(CURSOR.fetchone())
+
+
+def disconnect():
+    """ Testing to disconnect from SQLite """
+
+    CURSOR.close()
