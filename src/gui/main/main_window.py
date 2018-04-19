@@ -196,16 +196,16 @@ class JudiWindow(QWidget):
             print(f'on_grnLineEdit_textChanged: {e} - {type(e)}')
 
         except pyodbc.OperationalError as e:   # Disconnect error?
-            self.dncTextEdit.setText('Session has timed-out. Try re-opening the app.')
+            # [x] TODO: create an auto recon when this error happens
+            self.dncTextEdit.setText('Disconnected from GIPM. Press \'<b>F6</b>\' or reopen the app to reconnect.')
             print(f'on_grnLineEdit_textChanged: {e} - {type(e)}')
-            # [] TODO: create an auto recon when this error happens
 
         except AttributeError as e:
-            self.dncTextEdit.setText('AttributeError. Try re-opening the app.')
+            self.dncTextEdit.setText('AttributeError. Try reopening the app.')
             print(f'on_grnLineEdit_textChanged: {e} - {type(e)}')
 
         except Exception as e:
-            self.dncTextEdit.setText('Judi is not feeling well. Try re-opening the app.')
+            self.dncTextEdit.setText('You found a new error. Try reopening the app.')
             print(f'on_grnLineEdit_textChanged: {e} - {type(e)}')
 
     def clear_criteria_fields(self):
@@ -278,6 +278,10 @@ class JudiWindow(QWidget):
             self.clear_criteria_fields()
             self.grnLineEdit.clear()
             self.dncTextEdit.clear()
+
+        # TEST: adding 'F6' to reconnect from GIPM server
+        if event.key() == Qt.Key_F6:
+            self._gsmconnect()
 
     def closeEvent(self, event):
 
