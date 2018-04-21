@@ -1,5 +1,6 @@
 # Judi's main user interface
 
+import sqlite3
 import pyodbc
 from PyQt5.QtCore import (Qt,
                           QDate,
@@ -195,7 +196,7 @@ class JudiWindow(QWidget):
             self.dncTextEdit.setText('No record found. Try again.')
             print(f'on_grnLineEdit_textChanged: {e} - {type(e)}')
 
-        except pyodbc.OperationalError as e:   # Disconnect error?
+        except (pyodbc.OperationalError, sqlite3.ProgrammingError) as e:   # Disconnect error?
             # [x] TODO: create an auto recon when this error happens
             self.dncTextEdit.setText('Disconnected from GIPM. Press \'<b>F6</b>\' or reopen the app to reconnect.')
             print(f'on_grnLineEdit_textChanged: {e} - {type(e)}')
@@ -281,7 +282,15 @@ class JudiWindow(QWidget):
 
         # TEST: adding 'F6' to reconnect from GIPM server
         if event.key() == Qt.Key_F6:
+            # [] TODO: send message to the user while reconnecting is happening
+            self.dncTextEdit.setText('Reconnecting...')
             self._gsmconnect()
+            self.dncTextEdit.setText('You are now connected to GIPM.')
+
+        # TEST: adding 'F7' to disconnect from SQLite database
+        if event.key() == Qt.Key_F7:
+            judi.disconnect()
+            print('Disconnected from SQLite')
 
     def closeEvent(self, event):
 
