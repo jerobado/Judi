@@ -6,15 +6,19 @@
     Author: Jero Bado
  """
 
+import logging
 import os
 import sys
 from PyQt5.QtWidgets import QApplication
 from src.resources.constant import (__appname__,
-                                    __orgname__)
+                                    __orgname__,
+                                    LOGGER)
 
 APP = QApplication(sys.argv)
 APP.setOrganizationName(__orgname__)
 APP.setApplicationName(__appname__)
+
+LOGGER = logging.getLogger(__name__)
 
 
 def check_environment():
@@ -28,11 +32,11 @@ def check_environment():
     else:
         # Judi is currently running in Python environment
         bundle_dir = os.path.dirname(os.path.abspath(__file__))
-    print(f'[JUDI]: I am {frozen} frozen')
-    print(f'[JUDI]: bundle dir is {bundle_dir}')
-    print(f'[JUDI]: sys.argv[0] is {sys.argv[0]}')
-    print(f'[JUDI]: sys.executable is {sys.executable}')
-    print(f'[JUDI]: os.getcwd is {os.getcwd()}')
+    LOGGER.info(f'I am {frozen} frozen')
+    LOGGER.info(f'bundle dir is {bundle_dir}')
+    LOGGER.info(f'sys.argv[0] is {sys.argv[0]}')
+    LOGGER.info(f'sys.executable is {sys.executable}')
+    LOGGER.info(f'os.getcwd is {os.getcwd()}')
 
 
 if __name__ == '__main__':

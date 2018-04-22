@@ -1,5 +1,6 @@
 # Judi's main user interface
 
+import logging
 import sqlite3
 import pyodbc
 from PyQt5.QtCore import (Qt,
@@ -30,8 +31,11 @@ from src.resources.constant import (__appname__,
                                     SETTINGS_GEOMETRY,
                                     STYLE_QSS_FILE,
                                     TRADEMARK_COMPLETER,
-                                    USERNAME)
+                                    USERNAME,
+                                    LOGGER)
 from src.resources import judi_resources
+
+LOGGER = logging.getLogger(__name__)
 
 
 class JudiWindow(QWidget):
@@ -45,7 +49,7 @@ class JudiWindow(QWidget):
         self._layout()
         self._properties()
         self._connections()
-        self._gsmconnect()
+        self._gsmconnect()  # [] TODO: delete and replace with judi.connect()
         self._read_settings()
         self.AUTOCOPY = False
 
@@ -156,6 +160,7 @@ class JudiWindow(QWidget):
         self.switchPushButton.clicked.connect(self.on_switchPushButton_clicked)
         self.recipientLineEdit.textChanged.connect(self.on_criteriaChanged)
 
+    # [] TODO: for deletion
     def _gsmconnect(self):
         """ Connect to server and database.
 
@@ -174,10 +179,9 @@ class JudiWindow(QWidget):
             # Get the package to deliver
             grn = self.grnLineEdit.text().strip()
             record = judi.search(grn)   # perform the search
-            print(f'[JUDI]: {record}')
+            LOGGER.info(f'{record}')
             if record:
                 self.AUTOCOPY = True
-                print(f'on record found: self.AUTOCOPY -> {self.AUTOCOPY}')
                 # Deliver the package
                 self.trademarkLineEdit.setText(record.trademark)
                 self.countrycodeLineEdit.setText(CC.get(record.countryid))
@@ -194,20 +198,20 @@ class JudiWindow(QWidget):
             self.AUTOCOPY = False
             self.clear_criteria_fields()
             self.dncTextEdit.setText('No record found. Try again.')
-            print(f'on_grnLineEdit_textChanged: {e} - {type(e)}')
+            LOGGER.error(f'{e} - {type(e)}')
 
         except (pyodbc.OperationalError, sqlite3.ProgrammingError) as e:   # Disconnect error?
             # [x] TODO: create an auto recon when this error happens
             self.dncTextEdit.setText('Disconnected from GIPM. Press \'<b>F6</b>\' or reopen the app to reconnect.')
-            print(f'on_grnLineEdit_textChanged: {e} - {type(e)}')
+            LOGGER.error(f'{e} - {type(e)}')
 
         except AttributeError as e:
             self.dncTextEdit.setText('AttributeError. Try reopening the app.')
-            print(f'on_grnLineEdit_textChanged: {e} - {type(e)}')
+            LOGGER.error(f'{e} - {type(e)}')
 
         except Exception as e:
             self.dncTextEdit.setText('You found a new error. Try reopening the app.')
-            print(f'on_grnLineEdit_textChanged: {e} - {type(e)}')
+            LOGGER.error(f'{e} - {type(e)}')
 
     def clear_criteria_fields(self):
         """ Method that will clear the content of the input fields. """
@@ -229,7 +233,6 @@ class JudiWindow(QWidget):
         self.profiling_date = self.sentDateEdit.date()
         dnc = self.generate_dnc(self.emailtypeComboBox.currentIndex())
         self.dncTextEdit.setText(dnc)
-        print(f'on_criteriaChanged: self.AUTOCOPY -> {self.AUTOCOPY}')
         if self.AUTOCOPY:
             self.clipboard.setText(dnc)
 
@@ -264,8 +267,8 @@ class JudiWindow(QWidget):
 
     def resizeEvent(self, event):
 
-        #print(f'w x h: {self.height()} x {self.width()}')
-        pass
+        LOGGER.info(f'w x h: {self.height()} x {self.width()}')
+        #pass
 
     def keyPressEvent(self, event):
 
@@ -282,15 +285,16 @@ class JudiWindow(QWidget):
 
         # TEST: adding 'F6' to reconnect from GIPM server
         if event.key() == Qt.Key_F6:
-            # [] TODO: send message to the user while reconnecting is happening
+            # [x] TODO: send message to the user while reconnecting is happening
+            LOGGER.info('Reconnecting...')
             self.dncTextEdit.setText('Reconnecting...')
-            self._gsmconnect()
-            self.dncTextEdit.setText('You are now connected to GIPM.')
+            judi.connect()
+            self.dncTextEdit.setText('You are now connected to GIPM.')  # [] TODO: this thing shows even if it fails connecting
 
-        # TEST: adding 'F7' to disconnect from SQLite database
+        # TEST: adding 'F7' to disconnect from SQLite database -> for development only
         if event.key() == Qt.Key_F7:
             judi.disconnect()
-            print('Disconnected from SQLite')
+            LOGGER.error('Disconnected from SQLite')
 
     def closeEvent(self, event):
 

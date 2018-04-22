@@ -9,33 +9,52 @@
         ('5134412', 'Trademark', 'AWESOME TRADEMARK', 'China', 'CHN', 'Super Awesome Agent', '1111')
 """
 
+import logging
 import sqlite3
 import pyodbc
 from src.resources.constant import (CONNECTION_STR_SQLITE,
                                     DB_APP,
                                     DB_DATABASE,
+                                    DB_DRIVER,
                                     DB_SERVER,
                                     DB_PASSWORD,
                                     DB_USERNAME,
                                     GIPM_RECORD,
-                                    LOCAL_DRIVERS,
-                                    ODBC_DRIVERS,
-                                    SEARCH_SQL_FILE)
+                                    SEARCH_SQL_FILE,
+                                    LOGGER)
 
 CURSOR = None
+LOGGER = logging.getLogger(__name__)
 
 
-def get_latest_odbc_driver():
+def live_connection():
+    """ Connecting to GIPM. """
 
-    # Get common database driver
-    common_drivers = set(ODBC_DRIVERS).intersection(LOCAL_DRIVERS)
-    print(f'[JUDI]: installed ODBC driver(s): {common_drivers}')
+    global CURSOR
+    LOGGER.info('Connecting to GIPM...')
+    conn = pyodbc.connect(driver=DB_DRIVER,
+                          server=DB_SERVER,
+                          database=DB_DATABASE,
+                          uid=DB_USERNAME,
+                          pwd=DB_PASSWORD,
+                          app=DB_APP)
+    CURSOR = conn.cursor()
+    LOGGER.info('You are now connected to GIPM')
+    return True
 
-    # Get the latest ODBC driver
-    for driver in ODBC_DRIVERS:
-        if driver in common_drivers:
-            print(f'[JUDI]: using latest ODBC driver: {driver}')
-            return driver
+
+def dev_connection():
+    """ Connecting to SQLite. For development only.
+
+    return -> bool
+    """
+
+    global CURSOR
+    LOGGER.info('Connecting to SQLite...')
+    conn = sqlite3.connect(CONNECTION_STR_SQLITE)
+    LOGGER.info('Good! You are now connected to SQLite')
+    CURSOR = conn.cursor()
+    return True
 
 
 def connect():
@@ -44,32 +63,12 @@ def connect():
     return -> bool
     """
 
-    global CURSOR
-
     try:
-        DB_DRIVER = get_latest_odbc_driver()
-
-        # Connecting to GSM
-        # print(f'[JUDI]: Connecting to GSM...')
-        # conn = pyodbc.connect(driver=DB_DRIVER,
-        #                       server=DB_SERVER,
-        #                       database=DB_DATABASE,
-        #                       uid=DB_USERNAME,
-        #                       pwd=DB_PASSWORD,
-        #                       app=DB_APP)
-        # CURSOR = conn.cursor()
-        # print(f'[JUDI]: Good! You are now connected to GSM.')
-        # return True
-
-        # Connecting to SQLite
-        print(f'[JUDI]: Connecting to SQLite')
-        conn = sqlite3.connect(CONNECTION_STR_SQLITE)
-        print(f'[JUDI]: Good! You are now connected to SQLite')
-        CURSOR = conn.cursor()
-        return True
+        #return live_connection()
+        return dev_connection()
 
     except Exception as e:
-        print(f'[JUDI]: {e}')
+        LOGGER.error(f'Connection failed. Try again. {e}')
 
 
 def search(grn):
@@ -84,6 +83,6 @@ def search(grn):
 
 
 def disconnect():
-    """ Testing to disconnect from SQLite """
+    """ Disconnect from SQLite. For development only. """
 
     CURSOR.close()
