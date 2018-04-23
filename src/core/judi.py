@@ -66,9 +66,8 @@ def connect():
     try:
         #return live_connection()
         return dev_connection()
-
-    except Exception as e:
-        LOGGER.error(f'Connection failed. Try again. {e}')
+    except Exception as e:  # [] TODO: catch pyodbc.OperationalError
+        LOGGER.error(f'Connection failed. Try again. {e} -> Type: {type(e)}')
 
 
 def search(grn):

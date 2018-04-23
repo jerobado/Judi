@@ -49,7 +49,7 @@ class JudiWindow(QWidget):
         self._layout()
         self._properties()
         self._connections()
-        self._gsmconnect()  # [] TODO: delete and replace with judi.connect()
+        self._connect()
         self._read_settings()
         self.AUTOCOPY = False
 
@@ -149,6 +149,7 @@ class JudiWindow(QWidget):
         self.setLayout(first_col)
 
     def _connections(self):
+        """ Connections of Signals and Slots for widgets. """
 
         self.grnLineEdit.textChanged.connect(self.on_grnLineEdit_textChanged)
         self.sentDateEdit.dateChanged.connect(self.on_criteriaChanged)
@@ -160,14 +161,20 @@ class JudiWindow(QWidget):
         self.switchPushButton.clicked.connect(self.on_switchPushButton_clicked)
         self.recipientLineEdit.textChanged.connect(self.on_criteriaChanged)
 
-    # [] TODO: for deletion
-    def _gsmconnect(self):
-        """ Connect to server and database.
+    def _connect(self):
+        """ Connection to GIPM.
 
             return -> bool
         """
 
-        judi.connect()  # using the core
+        # [x] TODO: add try...except here to catch if disconnected
+        try:
+            judi.connect()
+            self.dncTextEdit.setText('You are now connected to GIPM')
+
+        except Exception as e:
+            LOGGER.error(f'{e}')
+            self.dncTextEdit.setText('Disconnected from GIPM. Press \'<b>F6</b>\' or reopen the app to reconnect.')
 
     def _read_settings(self):
 
@@ -194,7 +201,6 @@ class JudiWindow(QWidget):
 
         # [] TODO: group related exceptions
         except TypeError as e:  # No record found
-            # [x] TODO: refine where to place AUTOCOPY
             self.AUTOCOPY = False
             self.clear_criteria_fields()
             self.dncTextEdit.setText('No record found. Try again.')
@@ -255,7 +261,7 @@ class JudiWindow(QWidget):
                                       recipient=self.recipientLineEdit.text())
 
     def on_switchPushButton_clicked(self):
-        """ Event handler that will 'switch' the entries of the Sender and Recipient fields. """
+        """ Event handler that will 'switch' the current text of the Sender and Recipient fields. """
 
         # Get the current values of the fields
         sender = self.senderLineEdit.text()
@@ -285,11 +291,9 @@ class JudiWindow(QWidget):
 
         # TEST: adding 'F6' to reconnect from GIPM server
         if event.key() == Qt.Key_F6:
-            # [x] TODO: send message to the user while reconnecting is happening
             LOGGER.info('Reconnecting...')
             self.dncTextEdit.setText('Reconnecting...')
-            judi.connect()
-            self.dncTextEdit.setText('You are now connected to GIPM.')  # [] TODO: this thing shows even if it fails connecting
+            self._connect()
 
         # TEST: adding 'F7' to disconnect from SQLite database -> for development only
         if event.key() == Qt.Key_F7:
