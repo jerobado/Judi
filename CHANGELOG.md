@@ -6,14 +6,19 @@ All notable changes to this project will be documented on this file.
 
 _Release Date: 1 May 2018 (tentative)_
 
+* Highlights
+    * **TODO**: _Disputes_ and _Searches_ module can now be search 
+    * _Auto-copy_ feature will now only work if a valid GIPM record is found 
+
 * Feedback
     * Added commonly use _Brief Description_, _Sender_, and _Recipient_ in the `description`, `sender` and `recipient` fields respectively.
 
-* Shorcuts
+* Shortcuts
     * Added `F5` shortcut key to clear the input fields
+    * **TODO**: Added `F6` shortcut key to re-connect the app to GIPM
 
 * User Interface (UI)
-    * Remove the GRN label and replace it with the list of modules the app is currently searching
+    * Removed the _GRN_ label and replace it with the list of modules the app is currently searching
 
 
 **Patch 0.2**
