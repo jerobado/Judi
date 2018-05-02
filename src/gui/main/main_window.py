@@ -170,7 +170,7 @@ class JudiWindow(QWidget):
         # [x] TODO: add try...except here to catch if disconnected
         try:
             judi.connect()
-            self.dncTextEdit.setText('You are now connected to GIPM')
+            self.dncTextEdit.setText('You are now connected to GIPM.')
 
         except Exception as e:
             LOGGER.error(f'{e}')
