@@ -26,13 +26,14 @@ from src.resources.constant import (__appname__,
                                     COUNTRY_COMPLETER,
                                     DATE_FORMAT,
                                     DESCRIPTION_COMPLETER,
+                                    LOGGER,
+                                    MODULES_LABEL,
                                     NON_AB_TEMPLATE,
                                     OFFICE_COMPLETER,
                                     SETTINGS_GEOMETRY,
                                     STYLE_QSS_FILE,
                                     TRADEMARK_COMPLETER,
-                                    USERNAME,
-                                    LOGGER)
+                                    USERNAME)
 from src.resources import judi_resources
 
 LOGGER = logging.getLogger(__name__)
@@ -76,7 +77,7 @@ class JudiWindow(QWidget):
         self.grnLineEdit.setPlaceholderText('GRN')
         self.grnLineEdit.setObjectName('grnLineEdit')
 
-        self.modulesLabel.setText('Trademarks, Disputes, Searches')
+        self.modulesLabel.setText(MODULES_LABEL)
         self.modulesLabel.setObjectName('modulesLabel')
 
         self.sentDateEdit.setObjectName('sentDateEdit')
@@ -167,7 +168,6 @@ class JudiWindow(QWidget):
             return -> bool
         """
 
-        # [x] TODO: add try...except here to catch if disconnected
         try:
             judi.connect()
             self.dncTextEdit.setText('You are now connected to GIPM.')
@@ -182,6 +182,7 @@ class JudiWindow(QWidget):
 
     def on_grnLineEdit_textChanged(self):
 
+        # [] TODO: your try...except is looking ugly XD, try using the with context manager
         try:
             # Get the package to deliver
             grn = self.grnLineEdit.text().strip()
@@ -190,19 +191,17 @@ class JudiWindow(QWidget):
             if record:
                 self.AUTOCOPY = True
                 # Deliver the package
+                self.modulesLabel.setText(record.module)
                 self.trademarkLineEdit.setText(record.trademark)
                 self.countrycodeLineEdit.setText(CC.get(record.countryid))
                 self.senderLineEdit.setText(self.determine_agent(agent=record.agent,
                                                                  agent_id=record.agentid))
-            else:   # has no content
-                self.AUTOCOPY = False
-                self.clear_criteria_fields()
-                self.dncTextEdit.clear()
-
         # [] TODO: group related exceptions
         except TypeError as e:  # No record found
             self.AUTOCOPY = False
-            self.clear_criteria_fields()
+            self.modulesLabel.setText(MODULES_LABEL)
+            # [x] TODO: don't clear the brief description and recipient fields
+            self.clear_criteria_fields(clear_all=False)
             self.dncTextEdit.setText('No record found. Try again.')
             LOGGER.error(f'{e} - {type(e)}')
 
@@ -219,14 +218,19 @@ class JudiWindow(QWidget):
             self.dncTextEdit.setText('You found a new error. Try reopening the app.')
             LOGGER.error(f'{e} - {type(e)}')
 
-    def clear_criteria_fields(self):
+    def clear_criteria_fields(self, clear_all=True):
         """ Method that will clear the content of the input fields. """
 
-        self.trademarkLineEdit.clear()
-        self.countrycodeLineEdit.clear()
-        self.descriptionLineEdit.clear()
-        self.senderLineEdit.clear()
-        self.recipientLineEdit.clear()
+        if not clear_all:
+            self.trademarkLineEdit.clear()
+            self.countrycodeLineEdit.clear()
+            self.senderLineEdit.clear()
+        else:
+            self.trademarkLineEdit.clear()
+            self.countrycodeLineEdit.clear()
+            self.descriptionLineEdit.clear()
+            self.senderLineEdit.clear()
+            self.recipientLineEdit.clear()
 
     def determine_agent(self, agent, agent_id):
         """ Determine if the current agent is 3rd party or part of the Firm. """
@@ -264,8 +268,7 @@ class JudiWindow(QWidget):
         """ Event handler that will 'switch' the current text of the Sender and Recipient fields. """
 
         # Get the current values of the fields
-        sender = self.senderLineEdit.text()
-        recipient = self.recipientLineEdit.text()
+        sender, recipient = self.senderLineEdit.text(), self.recipientLineEdit.text()
 
         # Perform the simple switching of values
         self.senderLineEdit.setText(recipient)
@@ -289,7 +292,7 @@ class JudiWindow(QWidget):
             self.grnLineEdit.clear()
             self.dncTextEdit.clear()
 
-        # TEST: adding 'F6' to reconnect from GIPM server
+        # 'F6' reconnect to GIPM
         if event.key() == Qt.Key_F6:
             LOGGER.info('Reconnecting...')
             self.dncTextEdit.setText('Reconnecting...')
