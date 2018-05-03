@@ -10,6 +10,7 @@ import logging
 import os
 import sys
 from PyQt5.QtWidgets import QApplication
+from src.gui.main.main_window import JudiWindow
 from src.resources.constant import (__appname__,
                                     __orgname__,
                                     LOGGER)
@@ -40,7 +41,6 @@ def check_environment():
 
 
 if __name__ == '__main__':
-    from src.gui.main.main_window import JudiWindow
     check_environment()
     window = JudiWindow()
     window.clipboard = APP.clipboard()
