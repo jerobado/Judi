@@ -163,17 +163,12 @@ class JudiWindow(QWidget):
         self.recipientLineEdit.textChanged.connect(self.on_criteriaChanged)
 
     def _connect(self):
-        """ Connection to GIPM.
+        """ Connection to GIPM. """
 
-            return -> bool
-        """
-
-        try:
-            judi.connect()
+        if judi.connect():
             self.dncTextEdit.setText('You are now connected to GIPM.')
-
-        except Exception as e:
-            LOGGER.error(f'{e}')
+        else:
+            LOGGER.error('Initial connection failed')
             self.dncTextEdit.setText('Disconnected from GIPM. Press \'<b>F6</b>\' or reopen the app to reconnect.')
 
     def _read_settings(self):
@@ -200,13 +195,11 @@ class JudiWindow(QWidget):
         except TypeError as e:  # No record found
             self.AUTOCOPY = False
             self.modulesLabel.setText(MODULES_LABEL)
-            # [x] TODO: don't clear the brief description and recipient fields
             self.clear_criteria_fields(clear_all=False)
             self.dncTextEdit.setText('No record found. Try again.')
             LOGGER.error(f'{e} - {type(e)}')
 
         except (pyodbc.OperationalError, sqlite3.ProgrammingError) as e:   # Disconnect error?
-            # [x] TODO: create an auto recon when this error happens
             self.dncTextEdit.setText('Disconnected from GIPM. Press \'<b>F6</b>\' or reopen the app to reconnect.')
             LOGGER.error(f'{e} - {type(e)}')
 
@@ -276,8 +269,7 @@ class JudiWindow(QWidget):
 
     def resizeEvent(self, event):
 
-        LOGGER.info(f'w x h: {self.height()} x {self.width()}')
-        #pass
+        LOGGER.info(f'w x h: {self.width()} x {self.height()}')
 
     def keyPressEvent(self, event):
 
