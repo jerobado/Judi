@@ -273,18 +273,18 @@ class JudiWindow(QWidget):
 
     def keyPressEvent(self, event):
 
-        # When the user pressed the keys 'Ctr+Q'
+        # 'Ctr+Q' -> close the app
         if event.modifiers() & Qt.ControlModifier and event.key() == Qt.Key_Q:
             self.close()
 
-        # 'F5' clear fields
+        # 'F5' -> clear fields
         if event.key() == Qt.Key_F5:
             self.AUTOCOPY = False
             self.clear_criteria_fields()
             self.grnLineEdit.clear()
             self.dncTextEdit.clear()
 
-        # 'F6' reconnect to GIPM
+        # 'F6' -> reconnect to GIPM
         if event.key() == Qt.Key_F6:
             LOGGER.info('Reconnecting...')
             self.dncTextEdit.setText('Reconnecting...')
