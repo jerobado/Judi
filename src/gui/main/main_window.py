@@ -95,6 +95,7 @@ class JudiWindow(QWidget):
 
         self.emailtypeComboBox.addItems(AB_EMAIL_TYPE)
         self.emailtypeComboBox.setObjectName('emailtypeComboBox')
+        self.emailtypeComboBox.setVisible(False)
 
         self.descriptionLineEdit.setPlaceholderText('Brief Description')
         self.descriptionLineEdit.setObjectName('descriptionLineEdit')
@@ -106,6 +107,7 @@ class JudiWindow(QWidget):
 
         self.switchPushButton.setObjectName('switchPushButton')
         self.switchPushButton.setShortcut('Alt+S')
+        self.switchPushButton.setToolTip('Switch Sender and Recipient (Alt+S)')
         self.switchPushButton.setFlat(True)
         self.switchPushButton.setIcon(QIcon(':/switch1-16.png'))
 
@@ -184,6 +186,11 @@ class JudiWindow(QWidget):
             record = judi.search(grn)   # perform the search
             LOGGER.info(f'{record}')
             if record:
+                # [] TODO: make this Pythonic
+                if not record.client == 'Abbott':
+                    self.emailtypeComboBox.setVisible(False)
+                else:
+                    self.emailtypeComboBox.setVisible(True)
                 self.AUTOCOPY = True
                 # Deliver the package
                 self.modulesLabel.setText(record.module)
@@ -241,6 +248,7 @@ class JudiWindow(QWidget):
 
     def generate_dnc(self, index):
 
+        # [] TODO: check if emailtypecombobox if visible or not
         if not index:
             return NON_AB_TEMPLATE.substitute(sent=self.profiling_date.toString(DATE_FORMAT),
                                               trademark=self.trademarkLineEdit.text(),
