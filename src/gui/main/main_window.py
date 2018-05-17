@@ -52,6 +52,7 @@ class JudiWindow(QWidget):
         self._connections()
         self._connect()
         self._read_settings()
+        self.abbott_client = None
         self.AUTOCOPY = False
 
     def _widgets(self):
@@ -186,11 +187,14 @@ class JudiWindow(QWidget):
             record = judi.search(grn)   # perform the search
             LOGGER.info(f'{record}')
             if record:
-                # [] TODO: make this Pythonic
-                if not record.client == 'Abbott':
-                    self.emailtypeComboBox.setVisible(False)
-                else:
+                # [] TODO: get the GRN of Abbott Laboratories
+                #if not record.clientid == '3':
+                if 'abbott' in str(record.client).lower():
                     self.emailtypeComboBox.setVisible(True)
+                    self.abbott_client = True
+                else:
+                    self.emailtypeComboBox.setVisible(False)
+                    self.abbott_client = False
                 self.AUTOCOPY = True
                 # Deliver the package
                 self.modulesLabel.setText(record.module)
@@ -241,7 +245,7 @@ class JudiWindow(QWidget):
     def on_criteriaChanged(self):
 
         self.profiling_date = self.sentDateEdit.date()
-        dnc = self.generate_dnc(self.emailtypeComboBox.currentIndex())
+        dnc = self.generate_dnc(self.emailtypeComboBox.currentIndex())  # [] TODO: argument not use, to be removed
         self.dncTextEdit.setText(dnc)
         if self.AUTOCOPY:
             self.clipboard.setText(dnc)
@@ -249,7 +253,7 @@ class JudiWindow(QWidget):
     def generate_dnc(self, index):
 
         # [] TODO: check if emailtypecombobox if visible or not
-        if not index:
+        if not self.abbott_client:
             return NON_AB_TEMPLATE.substitute(sent=self.profiling_date.toString(DATE_FORMAT),
                                               trademark=self.trademarkLineEdit.text(),
                                               countrycode=self.countrycodeLineEdit.text(),
@@ -299,9 +303,9 @@ class JudiWindow(QWidget):
             self._connect()
 
         # TEST: adding 'F7' to disconnect from SQLite database -> for development only
-        if event.key() == Qt.Key_F7:
-            judi.disconnect()
-            LOGGER.error('Disconnected from SQLite')
+        # if event.key() == Qt.Key_F7:
+        #     judi.disconnect()
+        #     LOGGER.error('Disconnected from SQLite')
 
     def closeEvent(self, event):
 
