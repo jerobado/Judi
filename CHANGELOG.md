@@ -11,9 +11,11 @@ _Release Date: 1 Jun 2018 (tentative)_
     * Added commonly use _Brief Description_, _Sender_, and _Recipient_ in the `description`, `sender` and `recipient` fields respectively.
 
 * User Interface (UI)
+    * _Email Type_ combobox is now only visible for Abbott-related records.
     * _Auto-copy_ feature will now only work if a valid GIPM record is found.
     * Removed the _GRN_ label.
-    * Added _Modules_ label that displays the current module of the searched record. 
+    * Added _Modules_ label that displays the current module of the searched record.
+    * Added a tooltip for the _Switch_ button to display its function and shortcut key.
 
 * Shortcuts
     * Added `F5` shortcut key to clear the input fields.
