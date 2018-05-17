@@ -20,6 +20,7 @@ from src.core import judi
 from src.resources.constant import (__appname__,
                                     __version__,
                                     AB_EMAIL_TYPE,
+                                    AB_MASTER_GRN,
                                     AB_TEMPLATE,
                                     BMO,
                                     CC,
@@ -52,7 +53,6 @@ class JudiWindow(QWidget):
         self._connections()
         self._connect()
         self._read_settings()
-        self.abbott_client = None
         self.AUTOCOPY = False
 
     def _widgets(self):
@@ -187,14 +187,10 @@ class JudiWindow(QWidget):
             record = judi.search(grn)   # perform the search
             LOGGER.info(f'{record}')
             if record:
-                # [] TODO: get the GRN of Abbott Laboratories
-                #if not record.clientid == '3':
-                if 'abbott' in str(record.client).lower():
-                    self.emailtypeComboBox.setVisible(True)
-                    self.abbott_client = True
-                else:
-                    self.emailtypeComboBox.setVisible(False)
-                    self.abbott_client = False
+                # [x] TODO: get the GRN of Abbott Laboratories
+                visible = True if record.clientid == AB_MASTER_GRN else False
+                self.emailtypeComboBox.setVisible(visible)
+
                 self.AUTOCOPY = True
                 # Deliver the package
                 self.modulesLabel.setText(record.module)
@@ -214,7 +210,7 @@ class JudiWindow(QWidget):
             self.dncTextEdit.setText('Disconnected from GIPM. Press \'<b>F6</b>\' or reopen the app to reconnect.')
             LOGGER.error(f'{e} - {type(e)}')
 
-        except AttributeError as e:
+        except AttributeError as e:     # Invalid keys or user is searching while disconnected
             self.dncTextEdit.setText('AttributeError. Try reopening the app.')
             LOGGER.error(f'{e} - {type(e)}')
 
@@ -245,15 +241,15 @@ class JudiWindow(QWidget):
     def on_criteriaChanged(self):
 
         self.profiling_date = self.sentDateEdit.date()
-        dnc = self.generate_dnc(self.emailtypeComboBox.currentIndex())  # [] TODO: argument not use, to be removed
+        dnc = self.generate_dnc()  # [x] TODO: argument not use, to be removed
         self.dncTextEdit.setText(dnc)
         if self.AUTOCOPY:
             self.clipboard.setText(dnc)
 
-    def generate_dnc(self, index):
+    def generate_dnc(self):
 
-        # [] TODO: check if emailtypecombobox if visible or not
-        if not self.abbott_client:
+        # [x] TODO: check if emailtypecombobox if visible or not
+        if not self.emailtypeComboBox.isVisible():
             return NON_AB_TEMPLATE.substitute(sent=self.profiling_date.toString(DATE_FORMAT),
                                               trademark=self.trademarkLineEdit.text(),
                                               countrycode=self.countrycodeLineEdit.text(),
