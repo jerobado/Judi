@@ -7,11 +7,11 @@ All notable changes to this project will be documented on this file.
 _Release Date: 1 Jun 2018 (tentative)_
 
 * Feedback
-    * **TODO**: _Disputes_, _Searches_ and _Registered Design_ modules can now be search.  
-    * Added commonly use _Brief Description_, _Sender_, and _Recipient_ in the `description`, `sender` and `recipient` fields respectively.
+    * **TODO**: _Disputes_, _Searches_* and _Registered Design_* modules can now be search.  
+    * Added commonly use _Trademarks_, _Country Code_, _Brief Description_, _Sender_, and _Recipient_ in the `trademark`, `countrycode`, `description`, `sender` and `recipient` fields respectively.
 
 * User Interface (UI)
-    * _Email Type_ combobox is now only visible for Abbott-related records.
+    * _Email Type_ combo box is now only visible for Abbott-related records.
     * _Auto-copy_ feature will now only work if a valid GIPM record is found.
     * Removed the _GRN_ label.
     * Added _Modules_ label that displays the current module of the searched record.
@@ -20,7 +20,7 @@ _Release Date: 1 Jun 2018 (tentative)_
 * Shortcuts
     * Added `F5` shortcut key to clear the input fields.
     * Added `F6` shortcut key to reconnect the app to GIPM.
-    * Added `Ctrl+Q` shortcut key to close the app.
+    * Added `Ctrl+Q` shortcut key to quit/close the app.
 
 **Patch 0.2**
 

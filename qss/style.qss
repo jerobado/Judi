@@ -26,8 +26,8 @@ QLabel {
 }
 
 #countrycodeLineEdit {
-    width: 40px;
-    max-width: 40px;
+    width: 60px;
+    max-width: 60px;
 }
 
 #emailtypeComboBox {

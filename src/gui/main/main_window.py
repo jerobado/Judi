@@ -90,7 +90,7 @@ class JudiWindow(QWidget):
         self.trademarkLineEdit.setObjectName('trademarkLineEdit')
         self.trademarkLineEdit.setCompleter(TRADEMARK_COMPLETER)
 
-        self.countrycodeLineEdit.setPlaceholderText('CC')
+        self.countrycodeLineEdit.setPlaceholderText('C. Code')
         self.countrycodeLineEdit.setObjectName('countrycodeLineEdit')
         self.countrycodeLineEdit.setCompleter(COUNTRY_COMPLETER)
 
@@ -171,8 +171,8 @@ class JudiWindow(QWidget):
         if judi.connect():
             self.dncTextEdit.setText('You are now connected to GIPM.')
         else:
-            LOGGER.error('Initial connection failed')
             self.dncTextEdit.setText('Disconnected from GIPM. Press \'<b>F6</b>\' or reopen the app to reconnect.')
+            LOGGER.error('Initial connection failed')
 
     def _read_settings(self):
 
@@ -185,19 +185,13 @@ class JudiWindow(QWidget):
             # Get the package to deliver
             grn = self.grnLineEdit.text().strip()
             record = judi.search(grn)   # perform the search
-            LOGGER.info(f'{record}')
             if record:
-                # [x] TODO: get the GRN of Abbott Laboratories
+                self.AUTOCOPY = True
                 visible = True if record.clientid == AB_MASTER_GRN else False
                 self.emailtypeComboBox.setVisible(visible)
+                self.display_record(record)
+            LOGGER.info(f'{record}')
 
-                self.AUTOCOPY = True
-                # Deliver the package
-                self.modulesLabel.setText(record.module)
-                self.trademarkLineEdit.setText(record.trademark)
-                self.countrycodeLineEdit.setText(CC.get(record.countryid))
-                self.senderLineEdit.setText(self.determine_agent(agent=record.agent,
-                                                                 agent_id=record.agentid))
         # [] TODO: group related exceptions
         except TypeError as e:  # No record found
             self.AUTOCOPY = False
@@ -217,6 +211,15 @@ class JudiWindow(QWidget):
         except Exception as e:
             self.dncTextEdit.setText('You found a new error. Try reopening the app.')
             LOGGER.error(f'{e} - {type(e)}')
+
+    def display_record(self, record):
+        """ Display found record to widgets. """
+
+        self.modulesLabel.setText(record.module)
+        self.trademarkLineEdit.setText(record.trademark)
+        self.countrycodeLineEdit.setText(CC.get(record.countryid))
+        self.senderLineEdit.setText(self.determine_agent(agent=record.agent,
+                                                         agent_id=record.agentid))
 
     def clear_criteria_fields(self, clear_all=True):
         """ Method that will clear the content of the input fields. """
@@ -241,14 +244,13 @@ class JudiWindow(QWidget):
     def on_criteriaChanged(self):
 
         self.profiling_date = self.sentDateEdit.date()
-        dnc = self.generate_dnc()  # [x] TODO: argument not use, to be removed
+        dnc = self.generate_dnc()
         self.dncTextEdit.setText(dnc)
         if self.AUTOCOPY:
             self.clipboard.setText(dnc)
 
     def generate_dnc(self):
 
-        # [x] TODO: check if emailtypecombobox if visible or not
         if not self.emailtypeComboBox.isVisible():
             return NON_AB_TEMPLATE.substitute(sent=self.profiling_date.toString(DATE_FORMAT),
                                               trademark=self.trademarkLineEdit.text(),
