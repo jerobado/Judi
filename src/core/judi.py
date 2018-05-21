@@ -79,7 +79,17 @@ def search(grn):
 
     grn = (grn,)
     CURSOR.execute(SEARCH_SQL_FILE, grn)
-    return GIPM_RECORD._make(CURSOR.fetchone())
+    # return GIPM_RECORD._make(CURSOR.fetchone())
+
+    results = CURSOR.fetchall()
+
+    if len(results) >= 2:
+        record = GIPM_RECORD._make(results[0])
+        return record._replace(trademark='MULTIPLE MARKS')
+    elif len(results) == 1:
+        return GIPM_RECORD._make(results[0])
+    else:
+        raise TypeError
 
 
 def disconnect():
