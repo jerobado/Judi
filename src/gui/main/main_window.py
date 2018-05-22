@@ -182,22 +182,17 @@ class JudiWindow(QWidget):
 
         # [] TODO: your try...except is looking ugly XD, try using the with context manager
         try:
-            # Get the package to deliver
-            grn = self.grnLineEdit.text().strip()
-            record = judi.search(grn)   # perform the search
-            if record:
-                self.AUTOCOPY = True
-                visible = True if record.clientid == AB_MASTER_GRN else False
-                self.emailtypeComboBox.setVisible(visible)
-                self.display_record(record)
-            LOGGER.info(f'{record}')
+            if self.grnLineEdit.text():
+                grn = self.grnLineEdit.text().strip()
+                record = judi.search(grn)
+                self.verify_record(grn, record)
+                LOGGER.info(f'record: {record}')
+            else:
+                self.dncTextEdit.clear()
 
         # [] TODO: group related exceptions
-        except TypeError as e:  # No record found
-            self.AUTOCOPY = False
-            self.modulesLabel.setText(MODULES_LABEL)
-            self.clear_criteria_fields(clear_all=False)
-            self.dncTextEdit.setText('No record found. Try again.')
+        except TypeError as e:
+            self.dncTextEdit.setText('TypeError. Try again.')
             LOGGER.error(f'{e} - {type(e)}')
 
         except (pyodbc.OperationalError, sqlite3.ProgrammingError) as e:   # Disconnect error?
@@ -205,12 +200,26 @@ class JudiWindow(QWidget):
             LOGGER.error(f'{e} - {type(e)}')
 
         except AttributeError as e:     # Invalid keys or user is searching while disconnected
-            self.dncTextEdit.setText('AttributeError. Try reopening the app.')
+            self.dncTextEdit.setText('Not connected to GIPM. Press \'<b>F6</b>\' or reopen the app to reconnect.')
             LOGGER.error(f'{e} - {type(e)}')
 
         except Exception as e:
             self.dncTextEdit.setText('You found a new error. Try reopening the app.')
             LOGGER.error(f'{e} - {type(e)}')
+
+    def verify_record(self, grn, record):
+        """ Verify record if valid or not. """
+
+        if record:
+            self.AUTOCOPY = True
+            visible = True if record.clientid == AB_MASTER_GRN else False
+            self.emailtypeComboBox.setVisible(visible)
+            self.display_record(record)
+        else:
+            self.AUTOCOPY = False
+            self.modulesLabel.setText(MODULES_LABEL)
+            self.clear_criteria_fields(clear_all=False)
+            self.dncTextEdit.setText(f'No record found for GRN \'{grn}\'. Try again.')
 
     def display_record(self, record):
         """ Display found record to widgets. """
