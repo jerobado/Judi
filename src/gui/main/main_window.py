@@ -169,7 +169,8 @@ class JudiWindow(QWidget):
         """ Connection to GIPM. """
 
         if judi.connect():
-            self.dncTextEdit.setText('You are now connected to GIPM.')
+            # [] TODO: have a sample of valid random GIPM records
+            self.dncTextEdit.setText('You are now connected to GIPM. Try searching this record: GRN 6120345.')
         else:
             self.dncTextEdit.setText('Disconnected from GIPM. Press \'<b>F6</b>\' or reopen the app to reconnect.')
             LOGGER.error('Initial connection failed')
