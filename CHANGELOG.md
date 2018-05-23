@@ -7,7 +7,7 @@ All notable changes to this project will be documented on this file.
 _Release Date: 1 Jun 2018 (tentative)_
 
 * Feedback
-    * **TODO**: _Disputes_, _Searches_* and _Registered Design_* modules can now be search.  
+    * _Disputes_, _Searches_ and _Registered Design_ modules can now be search.  
     * Added commonly use _Trademarks_, _Country Code_, _Brief Description_, _Sender_, and _Recipient_ in the `trademark`, `countrycode`, `description`, `sender` and `recipient` fields respectively.
 
 * User Interface (UI)
