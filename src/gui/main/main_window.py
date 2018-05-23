@@ -1,6 +1,7 @@
 # Judi's main user interface
 
 import logging
+import random
 import sqlite3
 import pyodbc
 from PyQt5.QtCore import (Qt,
@@ -31,6 +32,7 @@ from src.resources.constant import (__appname__,
                                     MODULES_LABEL,
                                     NON_AB_TEMPLATE,
                                     OFFICE_COMPLETER,
+                                    SAMPLE_GRNS,
                                     SETTINGS_GEOMETRY,
                                     STYLE_QSS_FILE,
                                     TRADEMARK_COMPLETER,
@@ -169,8 +171,8 @@ class JudiWindow(QWidget):
         """ Connection to GIPM. """
 
         if judi.connect():
-            # [] TODO: have a sample of valid random GIPM records
-            self.dncTextEdit.setText('You are now connected to GIPM. Try searching this record: GRN 6120345.')
+            # [x] TODO: have a sample of valid random GIPM records
+            self.dncTextEdit.setText(f'You are now connected to GIPM. Try searching this record: GRN {random.choice(SAMPLE_GRNS)}.')
         else:
             self.dncTextEdit.setText('Disconnected from GIPM. Press \'<b>F6</b>\' or reopen the app to reconnect.')
             LOGGER.error('Initial connection failed')
@@ -189,6 +191,9 @@ class JudiWindow(QWidget):
                 self.verify_record(grn, record)
                 LOGGER.info(f'record: {record}')
             else:
+                self.AUTOCOPY = False
+                self.modulesLabel.setText(MODULES_LABEL)
+                self.clear_criteria_fields()
                 self.dncTextEdit.clear()
 
         # [] TODO: group related exceptions
@@ -299,6 +304,7 @@ class JudiWindow(QWidget):
 
         # 'F5' -> clear fields
         if event.key() == Qt.Key_F5:
+            LOGGER.info('Clearing fields')
             self.AUTOCOPY = False
             self.clear_criteria_fields()
             self.grnLineEdit.clear()

@@ -18,7 +18,7 @@ _Release Date: 1 Jun 2018 (tentative)_
     * Added a tooltip for the _Switch_ button to display its function and shortcut key.
 
 * Shortcuts
-    * Added `F5` shortcut key to clear the input fields.
+    * Added `F5` shortcut key to clear the criteria fields.
     * Added `F6` shortcut key to reconnect the app to GIPM.
     * Added `Ctrl+Q` shortcut key to quit/close the app.
 
