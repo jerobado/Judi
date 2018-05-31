@@ -7,12 +7,12 @@ All notable changes to this project will be documented on this file.
 _Release Date: 1 Jun 2018 (tentative)_
 
 * Feedback
-    * _Disputes_, _Searches_ and _Registered Design_ modules can now be search.  
-    * Added commonly use _Trademarks_, _Country Code_, _Brief Description_, _Sender_, and _Recipient_ in the `trademark`, `countrycode`, `description`, `sender` and `recipient` fields respectively.
+    * _Disputes_, _Searches_ and _Registered Design_ modules can now be searched correctly.  
+    * Added commonly use _Brief Description_, _Sender_, and _Recipient_ in the `description`, `sender` and `recipient` fields respectively.
 
 * User Interface (UI)
     * _Email Type_ combo box is now only visible for Abbott-related records.
-    * _Auto-copy_ feature will now only work if a valid GIPM record is found.
+    * _Auto-copy_ feature will now only work if a valid GIPM record is found and any of the criteria fields changes after searching.
     * Removed the _GRN_ label.
     * Added _Modules_ label that displays the current module of the searched record.
     * Added a tooltip for the _Switch_ button to display its function and shortcut key.
