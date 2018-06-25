@@ -4,7 +4,7 @@ All notable changes to this project will be documented on this file.
 
 **Patch 0.3**
 
-_Release Date: 1 Jun 2018 (tentative)_
+_Release Date: 1 Jun 2018 (latest)_
 
 * Feedback
     * _Disputes_, _Searches_ and _Registered Design_ modules can now be searched correctly.  
